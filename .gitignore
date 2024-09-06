@@ -1,0 +1,122 @@
+# Gradle files
+.gradle/
+**/build/
+**/out/
+
+# Local configuration files
+/local.properties
+/.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Android Studio files
+*.iml
+*.hprof
+/.cxx/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Gradle Wrapper
+gradle/wrapper/gradle-wrapper.properties
+gradle/wrapper/gradle-wrapper.jar
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Kotlin specific
+*.kotlin_module
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+*.iws
+*.idea/workspace.xml
+*.idea/tasks.xml
+*.idea/gradle.xml
+*.idea/libraries
+*.idea/modules.xml
+
+# APKs
+*.apk
+*.ap_
+
+# Cache files
+.cache/
+captures/
+*.ap_
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Others
+*.bak
+*.orig
+
+# Android Studio Generated
+.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+.idea/vcs.xml
+
+# Kotlin Multiplatform specific
+.cinterop/
+build/
+buildSrc/.gradle/
+buildSrc/build/
+
+# Git directories
+*.orig
+*.rej
+
+# Generated files
+*.class
+*.dex
+*.apk
+*.ap_
+*.so
+*.obj
+*.o
+*.a
+*.hprof
+*.DS_Store
+*.pyc
+*.pyo
+*.lock
+*.gz
+
+# IDE and other
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Jetpack Compose
+**/ui/build/
+
+# Unit test files
+coverage/
+
+# Custom lint and IDE settings
+.lint/
