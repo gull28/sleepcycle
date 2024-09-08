@@ -1,11 +1,12 @@
+import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.sleep_cycle.data.model.SleepTime
 import java.util.*
 
@@ -19,8 +20,27 @@ fun TimeInputDialog(
     val context = LocalContext.current
 
     var name by remember { mutableStateOf(TextFieldValue(sleepTime?.name ?: "")) }
-    var duration by remember { mutableStateOf(TextFieldValue(sleepTime?.duration?.toString() ?: "")) }
-    var time by remember { mutableStateOf(sleepTime?.startTime ?: "00:00") }
+    var startTime by remember { mutableStateOf(sleepTime?.startTime ?: "00:00") }
+    var duration by remember { mutableStateOf(sleepTime?.duration ?: 0) }
+
+    fun openStartTimePicker() {
+        val calendar = Calendar.getInstance()
+        val initialHour = startTime.split(":")[0].toIntOrNull() ?: calendar.get(Calendar.HOUR_OF_DAY)
+        val initialMinute = startTime.split(":")[1].toIntOrNull() ?: calendar.get(Calendar.MINUTE)
+
+        TimePickerDialog(context, { _, hourOfDay, minute ->
+            startTime = String.format("%02d:%02d", hourOfDay, minute)
+        }, initialHour, initialMinute, true).show()
+    }
+
+    fun openDurationPicker() {
+        val initialHour = duration / 60
+        val initialMinute = duration % 60
+
+        TimePickerDialog(context, { _, hourOfDay, minute ->
+            duration = hourOfDay * 60 + minute
+        }, initialHour, initialMinute, true).show()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -34,31 +54,34 @@ fun TimeInputDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                OutlinedTextField(
-                    value = time,
-                    onValueChange = { time = it },
-                    label = { Text("Start Time (HH:MM)") },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
-                )
+                Button(
+                    onClick = { openStartTimePicker() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text("Start Time: $startTime")
+                }
 
-                OutlinedTextField(
-                    value = duration,
-                    onValueChange = { duration = it },
-                    label = { Text("Duration (Minutes)") },
+                Button(
+                    onClick = { openDurationPicker() },
                     modifier = Modifier.fillMaxWidth()
-                )
+                ) {
+                    val durationHours = duration / 60
+                    val durationMinutes = duration % 60
+                    Text("Duration: ${String.format("%02d:%02d", durationHours, durationMinutes)}")
+                }
             }
         },
         confirmButton = {
             Button(onClick = {
-                val durationMinutes = duration.text.toIntOrNull()
-                if (name.text.isNotBlank() && durationMinutes != null && durationMinutes < 1440) {
+                if (name.text.isNotBlank() && duration > 0 && duration < 1440) {
                     val sleepTime = SleepTime(
                         id = sleepTime?.id,
                         scheduleId = sleepTime?.scheduleId,
                         name = name.text,
-                        startTime = time,
-                        duration = durationMinutes
+                        startTime = startTime,
+                        duration = duration
                     )
                     onSave(sleepTime)
                     onDismiss()

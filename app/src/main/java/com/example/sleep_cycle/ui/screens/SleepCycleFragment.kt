@@ -71,14 +71,12 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             Text("Add Time")
         }
 
-        Column {
-            Button(onClick = {
-                navController.navigateUp()
-            }) {
-                Text("Cancel")
-            }
+        Row {
 
-            Button(onClick = {
+            Button(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                onClick = {
+                    navController.navigateUp()
 
             }) {
                 Text("Done")

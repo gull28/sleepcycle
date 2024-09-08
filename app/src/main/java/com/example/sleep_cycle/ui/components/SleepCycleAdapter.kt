@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
+import com.example.sleep_cycle.helper.Time
 
 @Composable
 fun SleepCycleList(
@@ -50,6 +51,11 @@ fun SleepCycleItem(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = sleepCycle.name,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = "Sleep time ${Time.minutesToHHMM(sleepCycle.totalSleepTime())}",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
