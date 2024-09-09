@@ -8,8 +8,12 @@ import android.widget.Toast
 import com.example.sleep_cycle.data.SleepTimeDatabaseHelper
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.model.SleepTime
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class SleepCycleRepository(context: Context) {
+class SleepCycleRepository@Inject constructor(
+    @ApplicationContext private val context: Context
+){
 
     private val dbHelper = SleepTimeDatabaseHelper(context)
 
@@ -28,6 +32,7 @@ class SleepCycleRepository(context: Context) {
                         put("scheduleId", cycleId)
                         put("startTime", sleepTime.startTime)
                         put("duration", sleepTime.duration)
+                        put("isActive", 0)
                     }
                     db.insert("SleepTimes", null, sleepTimeValues)
                 }
@@ -52,6 +57,7 @@ class SleepCycleRepository(context: Context) {
 
         return if (cursor.moveToFirst()) {
             val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+            val isActive = cursor.getInt(cursor.getColumnIndexOrThrow("isActive"))
 
             val sleepTimes = mutableListOf<SleepTime>()
             val sleepTimeCursor = db.rawQuery("SELECT * FROM SleepTimes WHERE scheduleId = ?", arrayOf(id.toString()))
@@ -69,7 +75,7 @@ class SleepCycleRepository(context: Context) {
             }
             sleepTimeCursor.close()
 
-            SleepCycle(id, name, sleepTimes)
+            SleepCycle(id, name, sleepTimes, isActive )
         } else {
             null
         }.also {
@@ -87,6 +93,7 @@ class SleepCycleRepository(context: Context) {
             do {
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow("id"))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val isActive = cursor.getInt(cursor.getColumnIndexOrThrow("isActive"))
 
                 val sleepTimes = mutableListOf<SleepTime>()
                 val sleepTimeCursor = db.rawQuery("SELECT * FROM SleepTimes WHERE scheduleId = ?", arrayOf(id.toString()))
@@ -104,13 +111,41 @@ class SleepCycleRepository(context: Context) {
                 }
                 sleepTimeCursor.close()
 
-                sleepCycles.add(SleepCycle(id, name, sleepTimes))
+                sleepCycles.add(SleepCycle(id, name, sleepTimes, isActive))
             } while (cursor.moveToNext())
         }
         cursor.close()
         db.close()
         return sleepCycles
     }
+
+    fun toggleActive(id: Long): Boolean {
+        val db = dbHelper.writableDatabase
+
+        return try {
+            db.beginTransaction()
+
+            val currentActiveCursor = db.rawQuery("SELECT id FROM SleepCycles WHERE isActive = 1", null)
+
+            if (currentActiveCursor.moveToFirst()) {
+                val activeId = currentActiveCursor.getLong(currentActiveCursor.getColumnIndexOrThrow("id"))
+                db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(activeId))
+            }
+            currentActiveCursor.close()
+
+            db.execSQL("UPDATE SleepCycles SET isActive = 1 WHERE id = ?", arrayOf(id))
+
+            db.setTransactionSuccessful()
+            true
+        } catch (e: Exception) {
+            Log.e("DatabaseError", "Error toggling active sleep cycle: ${e.message}")
+            false
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
 
     fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>): Boolean {
         val db = dbHelper.writableDatabase

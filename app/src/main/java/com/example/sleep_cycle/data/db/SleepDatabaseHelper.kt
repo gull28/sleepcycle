@@ -36,14 +36,18 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SLEEP_TIMES")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SLEEP_CYCLES")
-        onCreate(db)
+        if (oldVersion < 2) {
+            val addIsActiveColumn = "ALTER TABLE $TABLE_SLEEP_CYCLES ADD COLUMN isActive INTEGER DEFAULT 0;"
+            db.execSQL(addIsActiveColumn)
+        }
+
     }
 
     companion object {
         private const val DATABASE_NAME = "sleep_cycle.db"
-        private const val DATABASE_VERSION = 1
+
+        // update db migration version
+        private const val DATABASE_VERSION = 2
 
         const val TABLE_SLEEP_CYCLES = "SleepCycles"
         const val TABLE_SLEEP_TIMES = "SleepTimes"

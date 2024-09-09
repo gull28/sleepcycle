@@ -26,7 +26,6 @@ import com.example.sleep_cycle.data.repository.SleepTimeRepository
 fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewModel) {
     val context = LocalContext.current
 
-    // Observing sleepTimes from the ViewModel
     val sleepTimesState = viewModel.sleepTimes.observeAsState()
 
     Log.d("sleeptimestate", sleepTimesState.toString())
@@ -74,10 +73,8 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
         Row {
 
             Button(
-                modifier = Modifier.padding(horizontal = 10.dp),
                 onClick = {
                     navController.navigateUp()
-
             }) {
                 Text("Done")
             }

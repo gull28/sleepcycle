@@ -8,11 +8,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SleepCycleViewModel @Inject constructor() : ViewModel() {
+class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: SleepCycleRepository
+) : ViewModel() {
 
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
@@ -33,7 +35,6 @@ class SleepCycleViewModel @Inject constructor() : ViewModel() {
     val errorMessage: LiveData<String?> get() = _errorMessage
 
     fun setSleepCycle(sleepCycle: SleepCycle) {
-        Log.d("asdasdasda123", sleepCycle.toString())
         _sleepCycle.value = sleepCycle
         _sleepTimes.value = sleepCycle.sleepTimes.toMutableList()
     }
@@ -75,6 +76,16 @@ class SleepCycleViewModel @Inject constructor() : ViewModel() {
         _sleepTimes.value?.let {
             it.removeAt(position)
             _sleepTimes.value = it
+        }
+    }
+
+    fun toggleActive(id: Long) {
+        val result = sleepCycleRepository.toggleActive(id)
+        if (result) {
+            // Update LiveData or handle UI updates if needed
+            Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
+        } else {
+            _errorMessage.value = "Error: Unable to toggle sleep cycle."
         }
     }
 }
