@@ -140,7 +140,6 @@ class SleepCycleRepository@Inject constructor(
             }
             currentActiveCursor.close()
 
-            Log.d("activeone", activeId.toString())
             // Toggle the passed id: if it's already active, deactivate it; otherwise, activate it
             if (activeId == id) {
                 db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(id))
@@ -211,11 +210,22 @@ class SleepCycleRepository@Inject constructor(
         return result
     }
 
-    fun deleteSleepCycle(id: Long): Int {
+    fun deleteSleepCycle(id: Long): Boolean {
         val db = dbHelper.writableDatabase
-        db.delete("SleepTimes", "scheduleId = ?", arrayOf(id.toString()))  // Delete associated SleepTimes
-        val result = db.delete("SleepCycles", "id = ?", arrayOf(id.toString()))
-        db.close()
-        return result
+
+        return try{
+            db.delete("SleepTimes", "scheduleId = ?", arrayOf(id.toString()))  // Delete associated SleepTimes
+            db.delete("SleepCycles", "id = ?", arrayOf(id.toString()))
+            true
+        }
+
+        catch (e: Exception){
+            Log.e("Database error", e.message.toString())
+            false
+        }
+
+        finally {
+            db.close()
+        }
     }
 }

@@ -79,11 +79,19 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
         }
     }
 
+    fun deleteSleepCycle(id: Long){
+        val result = sleepCycleRepository.deleteSleepCycle(id)
+
+        if(result){
+            Log.d("SleepCycleViewModel", "Sleep cycle deleted successfully.")
+            return
+        }
+        _errorMessage.value = "Error: Unable to delete sleep cycle."
+    }
+
     fun toggleActive(id: Long) {
-        Log.d("togglingRad", "zaza")
         val result = sleepCycleRepository.toggleActive(id)
         if (result) {
-            // Update LiveData or handle UI updates if needed
             Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
         } else {
             _errorMessage.value = "Error: Unable to toggle sleep cycle."
