@@ -17,7 +17,7 @@ class SleepCycleRepository@Inject constructor(
 
     private val dbHelper = SleepTimeDatabaseHelper(context)
 
-    fun addSleepCycle(context: Context, sleepCycle: SleepCycle): Long {
+    fun addSleepCycle(sleepCycle: SleepCycle): Long {
         val db = dbHelper.writableDatabase
         return try {
             val contentValues = ContentValues().apply {
@@ -32,7 +32,6 @@ class SleepCycleRepository@Inject constructor(
                         put("scheduleId", cycleId)
                         put("startTime", sleepTime.startTime)
                         put("duration", sleepTime.duration)
-                        put("isActive", 0)
                     }
                     db.insert("SleepTimes", null, sleepTimeValues)
                 }
@@ -57,7 +56,7 @@ class SleepCycleRepository@Inject constructor(
 
         return if (cursor.moveToFirst()) {
             val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
-            val isActive = cursor.getInt(cursor.getColumnIndexOrThrow("isActive"))
+//            val isActive = cursor.getInt(cursor.getColumnIndexOrThrow("isActive"))
 
             val sleepTimes = mutableListOf<SleepTime>()
             val sleepTimeCursor = db.rawQuery("SELECT * FROM SleepTimes WHERE scheduleId = ?", arrayOf(id.toString()))
@@ -75,7 +74,7 @@ class SleepCycleRepository@Inject constructor(
             }
             sleepTimeCursor.close()
 
-            SleepCycle(id, name, sleepTimes, isActive )
+            SleepCycle(id, name, sleepTimes, 0 )
         } else {
             null
         }.also {
@@ -122,18 +121,32 @@ class SleepCycleRepository@Inject constructor(
     fun toggleActive(id: Long): Boolean {
         val db = dbHelper.writableDatabase
 
+        Log.d("toggling", "123")
         return try {
             db.beginTransaction()
 
+            // Query to find the currently active entry
             val currentActiveCursor = db.rawQuery("SELECT id FROM SleepCycles WHERE isActive = 1", null)
+            var activeId: Long? = null
 
+            // Check if the cursor has any results and move to the first row
             if (currentActiveCursor.moveToFirst()) {
-                val activeId = currentActiveCursor.getLong(currentActiveCursor.getColumnIndexOrThrow("id"))
-                db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(activeId))
+                activeId = currentActiveCursor.getLong(currentActiveCursor.getColumnIndexOrThrow("id"))
+                Log.d("ToggleActive", "Currently active ID: $activeId")
+
+                if (activeId != id) {
+                    db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(activeId))
+                }
             }
             currentActiveCursor.close()
 
-            db.execSQL("UPDATE SleepCycles SET isActive = 1 WHERE id = ?", arrayOf(id))
+            Log.d("activeone", activeId.toString())
+            // Toggle the passed id: if it's already active, deactivate it; otherwise, activate it
+            if (activeId == id) {
+                db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(id))
+            } else {
+                db.execSQL("UPDATE SleepCycles SET isActive = 1 WHERE id = ?", arrayOf(id))
+            }
 
             db.setTransactionSuccessful()
             true
@@ -145,6 +158,7 @@ class SleepCycleRepository@Inject constructor(
             db.close()
         }
     }
+
 
 
     fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>): Boolean {

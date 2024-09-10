@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.example.sleep_cycle.data.db.Seed
 import com.example.sleep_cycle.data.model.SleepTime
 
 class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -15,7 +16,7 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
         val createSleepCyclesTable = """
             CREATE TABLE $TABLE_SLEEP_CYCLES (
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_NAME TEXT NOT NULL,
+                $COLUMN_NAME TEXT NOT NULL
             );
         """.trimIndent()
         db.execSQL(createSleepCyclesTable)
@@ -36,18 +37,18 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 2) {
+        if (oldVersion < 3) {
             val addIsActiveColumn = "ALTER TABLE $TABLE_SLEEP_CYCLES ADD COLUMN isActive INTEGER DEFAULT 0;"
             db.execSQL(addIsActiveColumn)
         }
-
     }
 
     companion object {
         private const val DATABASE_NAME = "sleep_cycle.db"
 
         // update db migration version
-        private const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
+        const val SEED_VERSION = 1
 
         const val TABLE_SLEEP_CYCLES = "SleepCycles"
         const val TABLE_SLEEP_TIMES = "SleepTimes"

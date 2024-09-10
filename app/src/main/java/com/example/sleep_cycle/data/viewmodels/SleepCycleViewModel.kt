@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: SleepCycleRepository
 ) : ViewModel() {
-
+    
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
     }
@@ -80,6 +80,7 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
     }
 
     fun toggleActive(id: Long) {
+        Log.d("togglingRad", "zaza")
         val result = sleepCycleRepository.toggleActive(id)
         if (result) {
             // Update LiveData or handle UI updates if needed

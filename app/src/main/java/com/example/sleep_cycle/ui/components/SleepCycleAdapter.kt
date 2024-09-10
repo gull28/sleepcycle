@@ -32,6 +32,7 @@ fun SleepCycleList(
 ) {
     var activeSleepCycleId by remember { mutableStateOf(sleepCycles.find { it.isActive == 1 }?.id) }
 
+    Log.d("z123123", sleepCycles.toString())
     Column(modifier = Modifier.fillMaxSize()) {
         sleepCycles.forEach { sleepCycle ->
             SleepCycleItem(
@@ -42,9 +43,12 @@ fun SleepCycleList(
                     navController.navigate("detailsScreen")
                 },
                 onToggleActive = { id ->
-                    // Update the active sleep cycle in the repository
                     sleepCycleViewModel.toggleActive(id)
-                    // Update the UI to reflect the change
+                    if(id == activeSleepCycleId){
+                        activeSleepCycleId = null
+                        return@SleepCycleItem
+                    }
+
                     activeSleepCycleId = id
                 }
             )
@@ -92,12 +96,9 @@ fun SleepCycleItem(
             Switch(
                 checked = isActive,
                 onCheckedChange = { isChecked ->
-                    // Toggle only if the switch is turned on
-                    if (isChecked) {
                         sleepCycle.id?.let {
-                            // Update the repository and UI state
                             onToggleActive(it)
-                        }
+
                     }
                 }
             )

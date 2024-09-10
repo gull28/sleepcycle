@@ -90,7 +90,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 onClick = {
                     val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes, isActive = 0)
 
-                    sleepCycleRepository.addSleepCycle(context = localContext, sleepCycle = sleepCycle)
+                    sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
                     navController.navigate("home")
                 },
 

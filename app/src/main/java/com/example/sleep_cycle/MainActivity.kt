@@ -2,6 +2,7 @@ package com.example.sleep_cycle
 
 import AppNavHost
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,7 +22,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.sleep_cycle.data.SleepTimeDatabaseHelper
+import com.example.sleep_cycle.data.db.Seed
+import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -29,6 +36,8 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        checkAndSeedDatabase()
         setContent {
             Surface(
                 modifier = Modifier.fillMaxSize().fillMaxHeight(),
@@ -36,6 +45,20 @@ class MainActivity : ComponentActivity() {
             ) {
                 val navController = rememberNavController()
                 MainScreen(navController)
+            }
+        }
+    }
+
+    private fun checkAndSeedDatabase() {
+        val sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val lastSeedVersion = sharedPreferences.getInt("last_seed_version", 0)
+
+        if (lastSeedVersion < SleepTimeDatabaseHelper.SEED_VERSION) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val seed = Seed(SleepCycleRepository(baseContext))
+                seed.seedDatabase()
+
+                sharedPreferences.edit().putInt("last_seed_version", SleepTimeDatabaseHelper.SEED_VERSION).apply()
             }
         }
     }
