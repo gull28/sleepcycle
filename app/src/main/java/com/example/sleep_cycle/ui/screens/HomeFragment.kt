@@ -24,7 +24,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
             Text("Go to Second Screen")
         }
 
-        SleepCycleList(sleepCycles, navController, viewModel)
+        SleepCycleList(sleepCycles, navController, viewModel, limit = 1)
     }
 }
 

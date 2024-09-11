@@ -5,9 +5,8 @@ import com.example.sleep_cycle.data.model.SleepTime
 data class SleepCycle(
     val id: Long? = null,
     val name: String,
-    val sleepTimes: List<SleepTime> = emptyList()
-
-
+    val sleepTimes: List<SleepTime> = emptyList(),
+    val isActive: Int,
 ){
     public fun areTimesValid () : Boolean {
         return true

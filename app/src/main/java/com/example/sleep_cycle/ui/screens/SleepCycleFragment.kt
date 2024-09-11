@@ -7,6 +7,7 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +19,8 @@ import com.example.sleep_cycle.data.model.SleepTime
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 
@@ -26,17 +29,11 @@ import com.example.sleep_cycle.data.repository.SleepTimeRepository
 fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewModel) {
     val context = LocalContext.current
 
-    // Observing sleepTimes from the ViewModel
     val sleepTimesState = viewModel.sleepTimes.observeAsState()
-
-    Log.d("sleeptimestate", sleepTimesState.toString())
     val sleepTimes = sleepTimesState.value?.toMutableList() ?: mutableListOf() // Convert to a mutable list
 
-    Log.d("sleeptimes234234", sleepTimes.toString())
     val sleepCycle by viewModel.sleepCycle.observeAsState()
     val errorMessage by viewModel.errorMessage.observeAsState()
-
-    val repository = SleepCycleRepository(context)
 
     val showDialog = remember { mutableStateOf(false) }
     val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
@@ -60,10 +57,8 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
 
                 Log.d("sleeptimevalue", selectedSleepTime.value.toString())
             },
-            onRemoveClicked = { position: Int ->
-                // Use list method here
-                sleepTimes.removeAt(position)
-                viewModel.updateSleepTime(position = position, sleepTimes[position]) // Update ViewModel with the modified list
+            onRemoveClicked = { position: Int, sleepTime: SleepTime ->
+                sleepTime.id?.let { viewModel.removeSleepTime(it) }
             }
         )
 
@@ -71,13 +66,25 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             Text("Add Time")
         }
 
-        Row {
-
+        Row(modifier = Modifier.align(Alignment.End)) {
+            
             Button(
+                colors = ButtonDefaults.buttonColors(Color.Red),
                 modifier = Modifier.padding(horizontal = 10.dp),
                 onClick = {
-                    navController.navigateUp()
+                    sleepCycle?.id?.let { viewModel.deleteSleepCycle(id = it) }
 
+                    navController.navigate("home")
+                }
+            ){
+                Text(
+                    text = "Delete"
+                )
+            }
+
+            Button(
+                onClick = {
+                    navController.navigateUp()
             }) {
                 Text("Done")
             }
@@ -88,9 +95,8 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             TimeInputDialog(
                 sleepTime = currentSleepTime,
                 onSave = { sleepTime ->
-                    Log.d("sleeptimebeforesave", sleepTime.toString())
                     handleSaveSleepTime(sleepTime, viewModel, context, selectedSleepTime.value, navController)
-//                    selectedSleepTime.value = null
+                    selectedSleepTime.value = null
                 },
                 setShowDialog = {
                     showDialog.value = it
@@ -117,10 +123,7 @@ private fun handleSaveSleepTime(
 
     if (selectedSleepTime != null) {
         // Edit route]
-        Log.d("sleeptime123123123123", sleepTime.toString())
         val res = repository.updateSleepTime(sleepTime)
-
-        Log.d("resasdasd", res.toString())
 
         navController.navigate("home")
     } else {

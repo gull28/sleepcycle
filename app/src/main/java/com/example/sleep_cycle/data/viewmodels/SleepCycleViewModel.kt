@@ -6,14 +6,19 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.repository.SleepCycleRepository
+import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SleepCycleViewModel @Inject constructor() : ViewModel() {
-
+class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: SleepCycleRepository, private val sleepTimeRepository: SleepTimeRepository
+) : ViewModel() {
+    
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
     }
@@ -33,7 +38,6 @@ class SleepCycleViewModel @Inject constructor() : ViewModel() {
     val errorMessage: LiveData<String?> get() = _errorMessage
 
     fun setSleepCycle(sleepCycle: SleepCycle) {
-        Log.d("asdasdasda123", sleepCycle.toString())
         _sleepCycle.value = sleepCycle
         _sleepTimes.value = sleepCycle.sleepTimes.toMutableList()
     }
@@ -71,10 +75,45 @@ class SleepCycleViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun removeSleepTime(position: Int) {
-        _sleepTimes.value?.let {
-            it.removeAt(position)
-            _sleepTimes.value = it
+    fun removeSleepTime(id: Long) {
+        try {
+            val result = sleepTimeRepository.deleteSleepTime(id)
+
+            loadSleepTimes()
+            return
+        }
+
+        catch (e: Exception){
+            Log.e("SleepCycleViewModel", e.message.toString())
+            return
+        }
+    }
+
+    fun deleteSleepCycle(id: Long){
+        val result = sleepCycleRepository.deleteSleepCycle(id)
+
+        if(result){
+            Log.d("SleepCycleViewModel", "Sleep cycle deleted successfully.")
+            return
+        }
+        _errorMessage.value = "Error: Unable to delete sleep cycle."
+    }
+
+    fun toggleActive(id: Long) {
+        val result = sleepCycleRepository.toggleActive(id)
+        if (result) {
+            Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
+        } else {
+            _errorMessage.value = "Error: Unable to toggle sleep cycle."
+        }
+    }
+
+
+    private fun loadSleepTimes() {
+        // Load sleep times from repository and update the LiveData
+        viewModelScope.launch {
+            _sleepTimes.value =
+                sleepCycle.value?.id?.let { sleepCycleRepository.getSleepCycleById(it)?.sleepTimes } as MutableList<SleepTime>?
         }
     }
 }

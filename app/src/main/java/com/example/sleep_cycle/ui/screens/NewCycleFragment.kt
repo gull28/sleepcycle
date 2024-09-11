@@ -2,6 +2,7 @@ package com.example.sleep_cycle.ui.screens
 
 import TimeInputDialog
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -75,7 +76,8 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 selectedSleepTime.value = position
                 showDialog.value = true
             },
-            onRemoveClicked = { position: Int ->
+            onRemoveClicked = { position: Int, sleepTime: SleepTime ->
+                Log.d("sleeptime length", sleepTimes.toString())
                 sleepTimes.removeAt(position)
             }
         )
@@ -88,9 +90,9 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
         ) {
             Button(
                 onClick = {
-                    val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes)
+                    val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes, isActive = 0)
 
-                    sleepCycleRepository.addSleepCycle(context = localContext, sleepCycle = sleepCycle)
+                    sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
                     navController.navigate("home")
                 },
 

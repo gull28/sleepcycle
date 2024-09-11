@@ -1,12 +1,8 @@
 // SleepTimeList.kt
 package com.example.sleep_cycle.ui.components
 
-import android.util.Log
-import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,7 +22,7 @@ import com.example.sleep_cycle.data.model.SleepTime
 fun SleepTimeList(
     sleepTimes: List<SleepTime>,
     onEditClicked: (position: Int, sleepTime: SleepTime) -> Unit,
-    onRemoveClicked: (position: Int) -> Unit
+    onRemoveClicked: (Int, SleepTime) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -38,7 +34,7 @@ fun SleepTimeList(
             SleepTimeItem(
                 sleepTime = sleepTime,
                 onEditClicked = { onEditClicked(index, sleepTime) },
-                onRemoveClicked = { onRemoveClicked(index) }
+                onRemoveClicked = { onRemoveClicked(index, sleepTime) }
             )
         }
     }

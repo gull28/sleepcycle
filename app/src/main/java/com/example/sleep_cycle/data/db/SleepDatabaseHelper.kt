@@ -15,7 +15,7 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
         val createSleepCyclesTable = """
             CREATE TABLE $TABLE_SLEEP_CYCLES (
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_NAME TEXT NOT NULL,
+                $COLUMN_NAME TEXT NOT NULL
             );
         """.trimIndent()
         db.execSQL(createSleepCyclesTable)
@@ -43,7 +43,7 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
 
     companion object {
         private const val DATABASE_NAME = "sleep_cycle.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 3
 
         const val TABLE_SLEEP_CYCLES = "SleepCycles"
         const val TABLE_SLEEP_TIMES = "SleepTimes"
