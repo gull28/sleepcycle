@@ -58,7 +58,7 @@ fun SleepCycleList(
                 },
                 onToggleActive = { id ->
                     sleepCycleViewModel.toggleActive(id)
-                    if (id == activeSleepCycleId) {
+                    if(id == activeSleepCycleId){
                         activeSleepCycleId = null
                         return@SleepCycleItem
                     }
@@ -68,17 +68,15 @@ fun SleepCycleList(
             )
         }
 
-        if (showShowMoreButton) {
-            Button(onClick = { listCount.intValue += 5
-            Log.d("buttonpress", listCount.intValue.toString())
-                Log.d("buttonpress", mutatedSleepCycles.size.toString())
+        if(showShowMoreButton){
+            Button(onClick = {
+                listCount.intValue += 5
             }) {
-                Text(text = "Show more")
+
             }
         }
-
     }
-    }
+}
 
 
 @Composable
