@@ -90,10 +90,15 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
         ) {
             Button(
                 onClick = {
-                    val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes, isActive = 0)
-
-                    sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
-                    navController.navigate("home")
+                    try{
+                        val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes, isActive = 0)
+                        Log.d("zazaz124123123", sleepTimes.toString())
+                        val res = sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
+                        Log.d("respose from savenewcycle", res.toString())
+                        navController.navigate("home")
+                    }catch (e: Exception){
+                        Log.e("exceptionally bad", e.message.toString())
+                    }
                 },
 
             ) {
