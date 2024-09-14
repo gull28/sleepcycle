@@ -1,45 +1,33 @@
 package com.example.sleep_cycle.ui.screens
 
-import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.components.SleepCycleList
-import java.util.Calendar
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.PI
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.livedata.observeAsState
+import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.ui.components.Clock
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
-    val context = LocalContext.current
-    val sleepCycleRepository = SleepCycleRepository(context)
-    val sleepCycles = sleepCycleRepository.getAllSleepCycles()
+    // Observe sleepCycles and activeSleepCycle from the ViewModel
+    viewModel.getAllSleepCycles()
+    val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList()) // Observe list of cycles
+    val activeSleepCycle by viewModel.activeSleepCycle.observeAsState() // Observe active sleep cycle
 
-    // Wrap the content in a scrollable Box
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -55,16 +43,19 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
                 onClick = { navController.navigate("newCycleScreen") },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text("Go to Second Screen")
+                Text("Create New Cycle")
             }
 
-            // TODO: Create conditional render as well as display time slots for active cycle
-            Clock()
+            Clock(vertices = activeSleepCycle?.getSleepTimeVertices())
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            SleepCycleList(sleepCycles, navController, viewModel, limit = 3)
+            SleepCycleList(
+                sleepCycles = sleepCycles,
+                navController = navController,
+                sleepCycleViewModel = viewModel,
+                limit = 3
+            )
         }
     }
 }
-

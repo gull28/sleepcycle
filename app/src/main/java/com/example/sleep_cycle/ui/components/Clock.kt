@@ -12,16 +12,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
+import com.example.sleep_cycle.data.model.Vertice
 import java.util.Calendar
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.Color
+
+interface Vertices {
+     var start: Int;
+     var end: Int;
+}
+
+
+
 @Composable
-fun Clock() {
+fun Clock(vertices: List<Vertice>?) {
     var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
 
     // Update time every second
@@ -41,12 +51,44 @@ fun Clock() {
 
     val clockHandLocation: Double = (degreesPerHour * hour) + (degreesPerMinute * minute)
 
+    // Pulse animation for slices
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
     ) {
         drawClockFace(size = size)
+
+        // Draw the slices based on indices
+        if (vertices != null) {
+            vertices.forEach { vertice ->
+                val startAngle = vertice.start.toFloat() - 90f // Offset to start at the top
+                val sweepAngle = (vertice.end - vertice.start).toFloat()
+
+                // Check if the clock hand is within the vertice's range
+                val isHandWithinVertice = clockHandLocation >= vertice.start && clockHandLocation <= vertice.end
+
+                // Apply pulsating color if the clock hand is on top of the vertice
+                val sliceColor = if (isHandWithinVertice) {
+                    Color(0xFFADDFBF).copy(alpha = pulseAlpha) // Pulsate color
+                } else {
+                    Color(0xFFADDFBF) // Normal color
+                }
+
+                drawSlice(size = size, startAngle = startAngle, sweepAngle = sweepAngle, color = sliceColor)
+            }
+        }
+
         drawClockHand(size = size, angle = clockHandLocation)
     }
 }
@@ -75,5 +117,19 @@ fun DrawScope.drawClockHand(size: Size, angle: Double) {
         start = center,
         end = handEnd,
         strokeWidth = 5.dp.toPx()
+    )
+}
+
+fun DrawScope.drawSlice(size: Size, startAngle: Float, sweepAngle: Float, color: Color) {
+    // Draw an arc to represent the slice
+    val radius = size.minDimension / 2 * 0.75f
+    val center = Offset(size.width / 2, size.height / 2)
+    drawArc(
+        color = color, // Use the passed color, which will pulsate if within range
+        startAngle = startAngle,
+        sweepAngle = sweepAngle,
+        useCenter = true, // This creates the "pizza slice" effect
+        topLeft = Offset(center.x - radius, center.y - radius),
+        size = Size(radius * 2, radius * 2)
     )
 }

@@ -13,6 +13,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,9 +38,11 @@ fun SleepCycleList(
     limit: Int,
 ) {
     val listCount = remember { mutableIntStateOf(limit) }
-    var activeSleepCycleId by remember { mutableStateOf(sleepCycles.find { it.isActive == 1 }?.id) }
 
-    var mutatedSleepCycles = sleepCycles;
+    // Observe the active sleep cycle from the ViewModel
+    val activeSleepCycle by sleepCycleViewModel.activeSleepCycle.observeAsState()
+
+    var mutatedSleepCycles = sleepCycles
     if (sleepCycles.size >= listCount.intValue) {
         mutatedSleepCycles = sleepCycles.slice(indices = IntRange(0, listCount.intValue - 1))
     }
@@ -50,49 +53,49 @@ fun SleepCycleList(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
-            .heightIn(max = if (showShowMoreButton) Dp.Unspecified else 200.dp) // Restrict height initially
+            .heightIn(max = if (showShowMoreButton) Dp.Unspecified else 200.dp)
     ) {
-
-
         mutatedSleepCycles.forEach { sleepCycle ->
             SleepCycleItem(
                 sleepCycle = sleepCycle,
-                isActive = activeSleepCycleId == sleepCycle.id,
+                isActive = activeSleepCycle?.id == sleepCycle.id, // Use the ViewModel's active state
                 onClick = {
                     sleepCycleViewModel.setSleepCycle(sleepCycle)
                     navController.navigate("detailsScreen")
                 },
-                onToggleActive = { id ->
-                    sleepCycleViewModel.toggleActive(id)
-                    if (id == activeSleepCycleId) {
-                        activeSleepCycleId = null
-                        return@SleepCycleItem
+                onToggleActive = { cycle ->
+                    val isCurrentlyActive = activeSleepCycle?.id == cycle.id
+
+                    if (isCurrentlyActive) {
+                        sleepCycleViewModel.setActiveSleepCycle(null) // Deactivate if already active
+                    } else {
+                        sleepCycleViewModel.toggleActive(cycle.id!!)
+                        sleepCycleViewModel.setActiveSleepCycle(cycle) // Activate the selected sleep cycle
                     }
-                    activeSleepCycleId = id
                 }
             )
         }
 
-        if(showShowMoreButton){
+        if (showShowMoreButton) {
             Button(
                 modifier = Modifier.padding(8.dp),
                 onClick = {
-                listCount.intValue += 1
-            }) {
+                    listCount.intValue += 5
+                }
+            ) {
                 Text(text = "Show more")
             }
         }
-
-
     }
 }
+
 
 @Composable
 fun SleepCycleItem(
     sleepCycle: SleepCycle,
     isActive: Boolean,
     onClick: () -> Unit,
-    onToggleActive: (Long) -> Unit
+    onToggleActive: (SleepCycle) -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -126,7 +129,7 @@ fun SleepCycleItem(
                 checked = isActive,
                 onCheckedChange = { isChecked ->
                     sleepCycle.id?.let {
-                        onToggleActive(it)
+                        onToggleActive(sleepCycle)
                     }
                 }
             )

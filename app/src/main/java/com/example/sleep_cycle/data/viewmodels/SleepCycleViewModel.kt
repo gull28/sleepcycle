@@ -28,8 +28,17 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
         Log.d("SleepCycleViewModel", "ViewModel cleared")
     }
 
+    // set all cycles
+    private val _sleepCycles = MutableLiveData<List<SleepCycle>>()
+    val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
+
+    // this is selected  sleep cycle
     private val _sleepCycle = MutableLiveData<SleepCycle>()
     val sleepCycle: LiveData<SleepCycle> get() = _sleepCycle
+
+    // this is for active sleep cycle (toggled on)
+    private val _activeSleepCycle = MutableLiveData<SleepCycle?>()
+    val activeSleepCycle: MutableLiveData<SleepCycle?> get() = _activeSleepCycle
 
     private val _sleepTimes = MutableLiveData<MutableList<SleepTime>>(mutableListOf())
     val sleepTimes: LiveData<MutableList<SleepTime>> get() = _sleepTimes
@@ -40,6 +49,10 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
     fun setSleepCycle(sleepCycle: SleepCycle) {
         _sleepCycle.value = sleepCycle
         _sleepTimes.value = sleepCycle.sleepTimes.toMutableList()
+    }
+
+    fun setActiveSleepCycle(sleepCycle: SleepCycle?){
+        _activeSleepCycle.value = sleepCycle
     }
 
     fun clearError() {
@@ -99,7 +112,29 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
         _errorMessage.value = "Error: Unable to delete sleep cycle."
     }
 
+    fun getAllSleepCycles(): List<SleepCycle>? {
+        viewModelScope.launch {
+            val cycles = sleepCycleRepository.getAllSleepCycles()  // Assuming this returns List<SleepCycle>
+            _sleepCycles.value = cycles
+
+            val activeCycle = cycles.find { it.isActive == 1 }
+
+            if (activeCycle != null)
+                _activeSleepCycle.value = activeCycle
+        }
+
+        return _sleepCycles.value;
+
+        // find the active cycle
+    }
+
     fun toggleActive(id: Long) {
+        // find the sleepCycle
+        val activeCycle = sleepCycleRepository.getSleepCycleById(id)
+        // set it as active in the viewmodel
+        setActiveSleepCycle(activeCycle)
+        // profit
+
         val result = sleepCycleRepository.toggleActive(id)
         if (result) {
             Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
