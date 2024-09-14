@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -58,10 +57,15 @@ fun MainScreen(navController: NavHostController) {
                 CustomTopAppBar(navController = navController, showBackButton = true)
             }
         }
-    ) {
-        AppNavHost(navController = navController)
+    ) { innerPadding ->
+        // Apply the innerPadding to the content
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

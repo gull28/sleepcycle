@@ -6,6 +6,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,6 +54,7 @@ fun SleepCycleList(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .animateContentSize()
             .heightIn(max = if (showShowMoreButton) Dp.Unspecified else 200.dp)
     ) {
@@ -67,6 +70,7 @@ fun SleepCycleList(
                     val isCurrentlyActive = activeSleepCycle?.id == cycle.id
 
                     if (isCurrentlyActive) {
+                        sleepCycleViewModel.toggleActive(cycle.id!!)
                         sleepCycleViewModel.setActiveSleepCycle(null) // Deactivate if already active
                     } else {
                         sleepCycleViewModel.toggleActive(cycle.id!!)
@@ -78,7 +82,6 @@ fun SleepCycleList(
 
         if (showShowMoreButton) {
             Button(
-                modifier = Modifier.padding(8.dp),
                 onClick = {
                     listCount.intValue += 5
                 }
@@ -127,7 +130,7 @@ fun SleepCycleItem(
 
             Switch(
                 checked = isActive,
-                onCheckedChange = { isChecked ->
+                onCheckedChange = {
                     sleepCycle.id?.let {
                         onToggleActive(sleepCycle)
                     }

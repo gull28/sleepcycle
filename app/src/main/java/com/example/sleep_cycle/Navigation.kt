@@ -1,6 +1,7 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -13,14 +14,14 @@ import com.example.sleep_cycle.ui.screens.SleepCycleScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavHost(navController: NavHostController) {
-    val viewModel: SleepCycleViewModel =   hiltViewModel()
+fun AppNavHost(navController: NavHostController, modifier: Modifier) {
+    val viewModel: SleepCycleViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
         startDestination = "home",
         route = "main_graph",
-
+        modifier = modifier
         ) {
         composable("home") {
             HomeScreen(navController = navController, viewModel = viewModel)

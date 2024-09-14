@@ -41,13 +41,6 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Welcome to the Second Screen!",
-            style = MaterialTheme.typography.labelLarge,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = name.value,
@@ -56,7 +49,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = Color.White,
-                focusedBorderColor = Color.White,
+                focusedBorderColor = Color.Black,
                 unfocusedBorderColor = Color.Gray
             )
         )
