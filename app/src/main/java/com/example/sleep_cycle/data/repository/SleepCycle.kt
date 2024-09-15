@@ -49,7 +49,6 @@ class SleepCycleRepository@Inject constructor(
         }
     }
 
-
     fun getSleepCycleById(id: Long): SleepCycle? {
         val db = dbHelper.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM SleepCycles WHERE id = ?", arrayOf(id.toString()))

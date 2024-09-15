@@ -5,6 +5,12 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+
+interface TimeUntil {
+    var minutes: Int;
+    var seconds: Int;
+}
+
 class Time(private val minutes: Int) {
 
     companion object {
@@ -20,6 +26,23 @@ class Time(private val minutes: Int) {
         fun HHMMtoMinutes(strTime : String): Int {
             return 0
         }
+
+        fun getTimeUntil(timeInFuture: Calendar): String {
+            val currentTime = Calendar.getInstance()
+
+            if (timeInFuture.before(currentTime)) {
+                timeInFuture.add(Calendar.DATE, 1)
+            }
+
+            val diffInMillis = timeInFuture.timeInMillis - currentTime.timeInMillis
+
+            val diffInMinutes = diffInMillis / (1000 * 60)
+            val hours = diffInMinutes / 60
+            val minutes = diffInMinutes % 60
+
+            return String.format("%02d:%02d", hours, minutes)
+        }
+
 
         fun stringToDateObj(minutes: String): Calendar {
             val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
