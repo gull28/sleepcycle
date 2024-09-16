@@ -1,5 +1,6 @@
 package com.example.sleep_cycle.data.models
 
+import android.util.Log
 import com.example.sleep_cycle.data.model.SleepTime
 import com.example.sleep_cycle.data.model.Vertice
 import com.example.sleep_cycle.helper.Time
@@ -19,16 +20,20 @@ data class SleepCycle(
     fun getNextSleepTime(): SleepTime? {
         val currentTime = Calendar.getInstance()
 
-        val futureSleepTimes = sleepTimes.filter { sleepTime ->
+        val futureSleepTimes = sleepTimes.map { sleepTime ->
             val sleepStartTime = Time.stringToDateObj(sleepTime.startTime)
-            sleepStartTime.after(currentTime)
+
+            if (sleepStartTime.before(currentTime)) {
+                sleepStartTime.add(Calendar.DAY_OF_YEAR, 1)
+            }
+
+            Pair(sleepTime, sleepStartTime.timeInMillis)
         }
 
-        return futureSleepTimes.minByOrNull { sleepTime ->
-            val sleepStartTime = Time.stringToDateObj(sleepTime.startTime)
-            sleepStartTime.timeInMillis - currentTime.timeInMillis
-        }
+        return futureSleepTimes.minByOrNull { it.second }?.first
     }
+
+
 
     public fun getSleepTimeVertices(): List<Vertice> {
         val verticeList = mutableListOf<Vertice>()

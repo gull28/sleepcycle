@@ -16,6 +16,7 @@ import com.example.sleep_cycle.ui.components.SleepCycleList
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.components.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +33,16 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
         isLoading = false
     }
 
+    val nextCycle = activeSleepCycle?.getNextSleepTime()
+
+    Log.d("nextCyc", nextCycle.toString())
+    val timeUntilNextSleepTime = nextCycle?.startTime?.let {
+        Time.stringToDateObj(
+            it
+        )
+    }?.let { Time.getTimeUntil(it) }
+
+    Log.d("timeUntilNextSleepTime", timeUntilNextSleepTime.toString())
     Box(
         modifier = Modifier
             .fillMaxSize()
