@@ -51,6 +51,9 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    implementation(libs.androidx.core.ktx.v1101)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.localbroadcastmanager)
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)

@@ -1,7 +1,6 @@
 package com.example.sleep_cycle
 
 import AppNavHost
-import TimerService
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -32,6 +31,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
+import android.app.ActivityManager
+import androidx.core.content.ContextCompat
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -41,9 +43,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-
         setContent {
-            showPersistentNotification()
 
             Surface(
                 modifier = Modifier.fillMaxSize().fillMaxHeight(),
@@ -53,23 +53,32 @@ class MainActivity : ComponentActivity() {
                 MainScreen(navController)
             }
         }
+        if (true ) {
+            val intent = Intent(this, ForegroundService::class.java)
+            ContextCompat.startForegroundService(this, intent)
+        }
+
     }
 
-    private fun showPersistentNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    override fun onDestroy() {
+        super.onDestroy()
 
-        // Create a notification builder
-        val builder = NotificationCompat.Builder(this, "your_channel_id")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Your Notification Title")
-            .setContentText("This is a persistent notification")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setOngoing(true) // Set to true for persistent notification
-
-        // Show the notification
-        val notificationId = 1 // Unique ID for the notification
-        notificationManager.notify(notificationId, builder.build())
+//        // Stop the foreground service when the activity is destroyed
+//        val serviceIntent = Intent(this, ForegroundService::class.java)
+//        stopService(serviceIntent)
     }
+}
+
+fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+    activityManager?.let {
+        for (service in it.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+    }
+    return false
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

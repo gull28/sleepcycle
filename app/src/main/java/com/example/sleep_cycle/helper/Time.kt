@@ -27,7 +27,7 @@ class Time(private val minutes: Int) {
             return 0
         }
 
-        fun getTimeUntil(timeInFuture: Calendar): String {
+        fun getTimeUntil(timeInFuture: Calendar): Long {
             val currentTime = Calendar.getInstance()
 
             if (timeInFuture.before(currentTime)) {
@@ -40,7 +40,7 @@ class Time(private val minutes: Int) {
             val hours = diffInMinutes / 60
             val minutes = diffInMinutes % 60
 
-            return String.format("%02d:%02d", hours, minutes)
+            return diffInMillis;
         }
 
         fun calendarToString(calendar: Calendar): String {
