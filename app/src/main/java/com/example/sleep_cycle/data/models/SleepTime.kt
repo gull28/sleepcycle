@@ -48,6 +48,14 @@ data class SleepTime(
         }
     }
 
+    fun getEndTime(): Calendar {
+        val startCal = Time.stringToDateObj(startTime);
+        val endTime = startCal.clone() as Calendar
+        endTime.add(Calendar.MINUTE, duration)
+
+        return endTime;
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun isTimeInTimeFrame(timeStart: String, timeEnd: String): Boolean {
         val formatter = DateTimeFormatter.ofPattern("HH:mm")

@@ -18,6 +18,8 @@ import com.example.sleep_cycle.data.model.SleepTime
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.helper.Time
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,8 +40,8 @@ class ForegroundService : Service() {
     }
 
     private val sleepCycleReceiver = object : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context, intent: Intent) {
-            Log.d("34234234234", " Update2839482348")
             if (intent.action == "UPDATE_SLEEP_CYCLE") {
                 fetchAndUpdateSleepTimes()
             }
@@ -47,6 +49,7 @@ class ForegroundService : Service() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForegroundServiceWithNotification()
 
@@ -56,15 +59,30 @@ class ForegroundService : Service() {
         return START_STICKY
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchAndUpdateSleepTimes() {
         // cancel on refetch
         countdownTimer?.cancel()
-        // Retrieve the next sleep time from the repository
-        val nextSleepTime = sleepCycleRepository.getActiveSleepCycle()?.getNextSleepTime()
+        val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle();
+        val currentTime = LocalTime.now() // Get current time
+        val formatter = DateTimeFormatter.ofPattern("HH:mm") // Define the desired format
+
+        val activeSleepTime = activeSleepCycle?.sleepTimes?.find { sleepTime ->
+            // sliight hack passing current time but hey :P, if it works, it works
+            sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
+        }
+
+        if (activeSleepTime != null){
+            startCountdown(Time.getTimeUntil(activeSleepTime.getEndTime()), "Sleep time ends in ")
+            return
+        }
+
+        val nextSleepTime = activeSleepCycle?.getNextSleepTime()
 
         if (nextSleepTime != null) {
-            // Start the countdown if the sleep time is found
-            startCountdown(nextSleepTime)
+            val timeUntilNextSleep = calculateTimeUntilNextSleep(nextSleepTime)
+
+            startCountdown(timeUntilNextSleep,"Next sleep time in ")
         } else {
             Log.d("ForegroundService", "No upcoming sleep time found.")
             stopSelf()
@@ -76,14 +94,13 @@ class ForegroundService : Service() {
     // ... i.e. if in sleep time, display time till end
     // for now, that is it
 
-    private fun startCountdown(nextSleepTime: SleepTime) {
-        val timeUntilNextSleep = calculateTimeUntilNextSleep(nextSleepTime)
-
-        countdownTimer = object : CountDownTimer(timeUntilNextSleep, 1000) {
+    private fun startCountdown(timeUntil: Long, text: String) {
+        countdownTimer = object : CountDownTimer(timeUntil, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                updateNotification(millisUntilFinished)
+                updateNotification(millisUntilFinished, text)
             }
 
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 fetchAndUpdateSleepTimes()
             }
@@ -114,7 +131,7 @@ class ForegroundService : Service() {
         }
     }
 
-    private fun updateNotification(millisUntilFinished: Long) {
+    private fun updateNotification(millisUntilFinished: Long, text: String) {
         val hours = millisUntilFinished / (1000 * 60 * 60)
         val minutes = (millisUntilFinished / (1000 * 60)) % 60
         val seconds = (millisUntilFinished / 1000) % 60
@@ -122,7 +139,7 @@ class ForegroundService : Service() {
         // Format the time as HH:MM:SS
         val timeRemaining = String.format("%02d:%02d:%02d", hours, minutes, seconds)
 
-        val notification = createNotification("Next sleep time in $timeRemaining")
+        val notification = createNotification("$text $timeRemaining")
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1, notification)
     }

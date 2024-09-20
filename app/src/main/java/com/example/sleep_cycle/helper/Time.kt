@@ -48,7 +48,6 @@ class Time(private val minutes: Int) {
             return dateFormat.format(calendar.time)
         }
 
-
         fun stringToDateObj(minutes: String): Calendar {
             val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             // Parse the time part of the string

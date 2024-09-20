@@ -53,7 +53,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx.v1101)
     implementation(libs.androidx.work.runtime)
-    implementation(libs.androidx.localbroadcastmanager)
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
