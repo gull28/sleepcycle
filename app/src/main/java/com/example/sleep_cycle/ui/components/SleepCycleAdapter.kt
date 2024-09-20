@@ -61,7 +61,7 @@ fun SleepCycleList(
         mutatedSleepCycles.forEach { sleepCycle ->
             SleepCycleItem(
                 sleepCycle = sleepCycle,
-                isActive = activeSleepCycle?.id == sleepCycle.id, // Use the ViewModel's active state
+                isActive = activeSleepCycle?.id == sleepCycle.id,
                 onClick = {
                     sleepCycleViewModel.setSleepCycle(sleepCycle)
                     navController.navigate("detailsScreen")
@@ -71,10 +71,10 @@ fun SleepCycleList(
 
                     if (isCurrentlyActive) {
                         sleepCycleViewModel.toggleActive(cycle.id!!)
-                        sleepCycleViewModel.setActiveSleepCycle(null) // Deactivate if already active
+                        sleepCycleViewModel.setActiveSleepCycle(null)
                     } else {
                         sleepCycleViewModel.toggleActive(cycle.id!!)
-                        sleepCycleViewModel.setActiveSleepCycle(cycle) // Activate the selected sleep cycle
+                        sleepCycleViewModel.setActiveSleepCycle(cycle)
                     }
                 }
             )

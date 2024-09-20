@@ -15,7 +15,8 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
         val createSleepCyclesTable = """
             CREATE TABLE $TABLE_SLEEP_CYCLES (
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_NAME TEXT NOT NULL
+                $COLUMN_NAME TEXT NOT NULL,
+                $COLUMN_ISACTIVE TEXT NOT NULL DEFAULT 0
             );
         """.trimIndent()
         db.execSQL(createSleepCyclesTable)
@@ -36,9 +37,12 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SLEEP_TIMES")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SLEEP_CYCLES")
-        onCreate(db)
+//        if(oldVersion < 2){
+//            val createSleepTimesTable = """
+//
+//            );
+//        """.trimIndent()
+//        }
     }
 
     companion object {
@@ -54,5 +58,6 @@ class SleepTimeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATA
         const val COLUMN_SCHEDULE_ID = "scheduleId"
         const val COLUMN_START_TIME = "startTime"
         const val COLUMN_DURATION = "duration"
+        const val COLUMN_ISACTIVE = "isActive"
     }
 }

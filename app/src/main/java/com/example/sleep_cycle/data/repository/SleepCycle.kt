@@ -17,6 +17,8 @@ class SleepCycleRepository@Inject constructor(
 
     private val dbHelper = SleepTimeDatabaseHelper(context)
 
+
+
     fun addSleepCycle(sleepCycle: SleepCycle): Long {
         val db = dbHelper.writableDatabase
         return try {
@@ -48,7 +50,6 @@ class SleepCycleRepository@Inject constructor(
             db.close()
         }
     }
-
 
     fun getSleepCycleById(id: Long): SleepCycle? {
         val db = dbHelper.readableDatabase
@@ -158,6 +159,44 @@ class SleepCycleRepository@Inject constructor(
         }
     }
 
+
+    fun getActiveSleepCycle() : SleepCycle? {
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery("SELECT * FROM SleepCycles WHERE isActive = 1", null)
+
+        return if (cursor.moveToFirst()) {
+            val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+//            val isActive = cursor.getInt(cursor.getColumnIndexOrThrow("isActive"))
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow("id"))
+
+
+            val sleepTimes = mutableListOf<SleepTime>()
+            val sleepTimeCursor = db.rawQuery("SELECT * FROM SleepTimes WHERE scheduleId = ?", arrayOf(id.toString()))
+            if (sleepTimeCursor.moveToFirst()) {
+                do {
+                    val sleepTime = SleepTime(
+                        id = sleepTimeCursor.getLong(sleepTimeCursor.getColumnIndexOrThrow("id")),
+                        name = sleepTimeCursor.getString(sleepTimeCursor.getColumnIndexOrThrow("name")),
+                        scheduleId = sleepTimeCursor.getLong(sleepTimeCursor.getColumnIndexOrThrow("scheduleId")),
+                        startTime = sleepTimeCursor.getString(sleepTimeCursor.getColumnIndexOrThrow("startTime")),
+                        duration = sleepTimeCursor.getInt(sleepTimeCursor.getColumnIndexOrThrow("duration"))
+                    )
+                    sleepTimes.add(sleepTime)
+                } while (sleepTimeCursor.moveToNext())
+            }
+            sleepTimeCursor.close()
+
+            SleepCycle(id, name, sleepTimes, 0 )
+        } else {
+            null
+        }.also {
+            cursor.close()
+            db.close()
+        }
+
+        cursor.close()
+    }
 
 
     fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>): Boolean {

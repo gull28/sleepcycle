@@ -1,6 +1,7 @@
 // SleepCycleModule.kt
-package com.example.sleep_cycle.di
+package com.example.sleep_cycle.data.modules
 
+import android.app.Application
 import android.content.Context
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
@@ -14,7 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object SleepCycleModule {
-
     @Provides
     @Singleton
     fun provideSleepCycleRepository(

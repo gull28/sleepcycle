@@ -1,22 +1,31 @@
 package com.example.sleep_cycle.data.viewmodels
 
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.sleep_cycle.ForegroundService
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.model.SleepTime
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: SleepCycleRepository, private val sleepTimeRepository: SleepTimeRepository
+class SleepCycleViewModel @Inject constructor(
+    private val sleepCycleRepository: SleepCycleRepository,
+    private val sleepTimeRepository: SleepTimeRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     
     init {
@@ -53,6 +62,9 @@ class SleepCycleViewModel @Inject constructor(private val sleepCycleRepository: 
 
     fun setActiveSleepCycle(sleepCycle: SleepCycle?){
         _activeSleepCycle.value = sleepCycle
+
+        val intent = Intent("UPDATE_SLEEP_CYCLE")
+        appContext.sendBroadcast(intent)
     }
 
     fun clearError() {

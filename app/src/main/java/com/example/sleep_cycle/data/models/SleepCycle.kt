@@ -1,8 +1,11 @@
 package com.example.sleep_cycle.data.models
 
+import android.util.Log
 import com.example.sleep_cycle.data.model.SleepTime
 import com.example.sleep_cycle.data.model.Vertice
+import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.components.Vertices
+import java.util.Calendar
 
 data class SleepCycle(
     val id: Long? = null,
@@ -13,6 +16,24 @@ data class SleepCycle(
     public fun areTimesValid () : Boolean {
         return true
     }
+
+    fun getNextSleepTime(): SleepTime? {
+        val currentTime = Calendar.getInstance()
+
+        val futureSleepTimes = sleepTimes.map { sleepTime ->
+            val sleepStartTime = Time.stringToDateObj(sleepTime.startTime)
+
+            if (sleepStartTime.before(currentTime)) {
+                sleepStartTime.add(Calendar.DAY_OF_YEAR, 1)
+            }
+
+            Pair(sleepTime, sleepStartTime.timeInMillis)
+        }
+
+        return futureSleepTimes.minByOrNull { it.second }?.first
+    }
+
+
 
     public fun getSleepTimeVertices(): List<Vertice> {
         val verticeList = mutableListOf<Vertice>()

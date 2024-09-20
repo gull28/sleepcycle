@@ -1,5 +1,6 @@
 package com.example.sleep_cycle.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +56,7 @@ fun Clock(vertices: List<Vertice>?) {
     )
 
     val animatedSweepAngles = vertices?.mapIndexed { index, vertice ->
-        val targetSweepAngle = (vertice.end - vertice.start).toFloat()
+        val targetSweepAngle = calculateClockwiseSweepAngle(vertice.start, vertice.end)
         animateFloatAsState(
             targetValue = targetSweepAngle,
             animationSpec = tween(durationMillis = 1000 + (index * 200), easing = FastOutSlowInEasing),
@@ -95,6 +96,14 @@ fun DrawScope.drawClockFace(size: Size) {
         radius = size.minDimension / 2 * 0.85f,
         center = Offset(size.width / 2, size.height / 2)
     )
+}
+
+fun calculateClockwiseSweepAngle(start: Int, end: Int): Float {
+    return if (end >= start) {
+        (end - start).toFloat()
+    } else {
+        (360 - start + end).toFloat()
+    }
 }
 
 fun DrawScope.drawClockHand(size: Size, angle: Double) {
