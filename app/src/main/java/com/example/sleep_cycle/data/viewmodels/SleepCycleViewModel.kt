@@ -1,6 +1,6 @@
 package com.example.sleep_cycle.data.viewmodels
 
-import android.content.Context
+import android.app.NotificationManager
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -10,7 +10,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.sleep_cycle.ForegroundService
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.model.SleepTime
@@ -20,14 +19,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.content.Context
 
 @HiltViewModel
 class SleepCycleViewModel @Inject constructor(
     private val sleepCycleRepository: SleepCycleRepository,
     private val sleepTimeRepository: SleepTimeRepository,
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
+
 ) : ViewModel() {
-    
+
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
     }
@@ -63,8 +64,23 @@ class SleepCycleViewModel @Inject constructor(
     fun setActiveSleepCycle(sleepCycle: SleepCycle?){
         _activeSleepCycle.value = sleepCycle
 
-        val intent = Intent("UPDATE_SLEEP_CYCLE")
-        appContext.sendBroadcast(intent)
+        // this is the case for when the user disables the notification when de-toggling a cycle
+        // get notif
+        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val existingNotification = notificationManager.activeNotifications.find { it.id == 1 }
+
+        // if doesnt exist create one
+        if (existingNotification == null) {
+            val serviceIntent = Intent(appContext, ForegroundService::class.java)
+            ContextCompat.startForegroundService(appContext, serviceIntent)
+
+            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+            appContext.sendBroadcast(broadcastIntent)
+        } else {
+            // otherwise broadcast change
+            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+            appContext.sendBroadcast(broadcastIntent)
+        }
     }
 
     fun clearError() {
@@ -105,6 +121,9 @@ class SleepCycleViewModel @Inject constructor(
             val result = sleepTimeRepository.deleteSleepTime(id)
 
             loadSleepTimes()
+
+            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+            appContext.sendBroadcast(broadcastIntent)
             return
         }
 
@@ -117,6 +136,8 @@ class SleepCycleViewModel @Inject constructor(
     fun deleteSleepCycle(id: Long){
         val result = sleepCycleRepository.deleteSleepCycle(id)
 
+        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+        appContext.sendBroadcast(broadcastIntent)
         if(result){
             Log.d("SleepCycleViewModel", "Sleep cycle deleted successfully.")
             return
@@ -142,12 +163,12 @@ class SleepCycleViewModel @Inject constructor(
 
     fun toggleActive(id: Long) {
         // find the sleepCycle
+        val result = sleepCycleRepository.toggleActive(id)
+
         val activeCycle = sleepCycleRepository.getSleepCycleById(id)
         // set it as active in the viewmodel
         setActiveSleepCycle(activeCycle)
         // profit
-
-        val result = sleepCycleRepository.toggleActive(id)
         if (result) {
             Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
         } else {

@@ -75,7 +75,18 @@ fun Clock(vertices: List<Vertice>?) {
             val startAngle = vertice.start.toFloat() - 90f
             val sweepAngle = animatedSweepAngles[index]
 
-            val isHandWithinVertice = clockHandLocation >= vertice.start && clockHandLocation <= vertice.end
+            Log.d("vertice123123", vertice.start.toString())
+            Log.d("1235345345", vertice.end.toString())
+
+            val isHandWithinVertice = if (vertice.start > vertice.end) {
+                (clockHandLocation >= vertice.start && clockHandLocation <= 360) ||
+                        (clockHandLocation >= 0 && clockHandLocation <= vertice.end)
+            } else {
+                // Regular case where start is before or equal to end
+                clockHandLocation >= vertice.start && clockHandLocation <= vertice.end
+            }
+
+
 
             val sliceColor = if (isHandWithinVertice) {
                 Color(0xFFADDFBF).copy(alpha = pulseAlpha) // Pulsate color

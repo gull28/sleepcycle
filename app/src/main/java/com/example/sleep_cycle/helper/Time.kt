@@ -1,6 +1,7 @@
 // Time.kt
 package com.example.sleep_cycle.helper
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -30,6 +31,7 @@ class Time(private val minutes: Int) {
         fun getTimeUntil(timeInFuture: Calendar): Long {
             val currentTime = Calendar.getInstance()
 
+            Log.d("currentTime", currentTime.toString())
             if (timeInFuture.before(currentTime)) {
                 timeInFuture.add(Calendar.DATE, 1)
             }

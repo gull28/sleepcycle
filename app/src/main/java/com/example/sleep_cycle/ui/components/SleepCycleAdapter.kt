@@ -1,6 +1,7 @@
 // SleepCycleList.kt
 package com.example.sleep_cycle.ui.components
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
@@ -25,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.sleep_cycle.ForegroundService
 import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel

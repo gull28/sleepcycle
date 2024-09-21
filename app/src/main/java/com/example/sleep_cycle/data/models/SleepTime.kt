@@ -1,6 +1,7 @@
 package com.example.sleep_cycle.data.model
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.sleep_cycle.helper.Time
 import java.text.SimpleDateFormat
@@ -49,12 +50,22 @@ data class SleepTime(
     }
 
     fun getEndTime(): Calendar {
-        val startCal = Time.stringToDateObj(startTime);
+        val startCal = Time.stringToDateObj(startTime)
         val endTime = startCal.clone() as Calendar
+
         endTime.add(Calendar.MINUTE, duration)
 
-        return endTime;
+        if (startCal.after(endTime)) {
+            startCal.add(Calendar.DAY_OF_YEAR, -1)
+            Log.d("adjustedStartTime", startCal.time.toString())
+        }
+
+        Log.d("endTime", endTime.time.toString())
+
+        return endTime
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun isTimeInTimeFrame(timeStart: String, timeEnd: String): Boolean {
@@ -62,9 +73,18 @@ data class SleepTime(
         val start = LocalTime.parse(startTime, formatter)
         val end = start.plusMinutes(duration.toLong())
 
+
         val startTimeToCheck = LocalTime.parse(timeStart, formatter)
         val endTimeToCheck = LocalTime.parse(timeEnd, formatter)
 
-        return startTimeToCheck.isBefore(end) && endTimeToCheck.isAfter(start)
+        return if (end.isBefore(start)) {
+            (startTimeToCheck.isAfter(start) || startTimeToCheck == start) ||
+                    (endTimeToCheck.isBefore(end))
+        } else {
+            (startTimeToCheck.isAfter(start) || startTimeToCheck == start) &&
+                    (endTimeToCheck.isBefore(end))
+        }
     }
+
+
 }

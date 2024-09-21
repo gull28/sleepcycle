@@ -1,5 +1,6 @@
 package com.example.sleep_cycle
 
+import TimeRange
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -33,7 +34,7 @@ class ForegroundService : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel() // Create notification channel on service creation
+        createNotificationChannel()
         registerReceiver(sleepCycleReceiver, IntentFilter("UPDATE_SLEEP_CYCLE"),
             RECEIVER_EXPORTED
        )
@@ -61,19 +62,21 @@ class ForegroundService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchAndUpdateSleepTimes() {
-        // cancel on refetch
+        // Cancel previous countdown if it's running
+        Log.d("fetchnupdate", "1233123")
         countdownTimer?.cancel()
-        val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle();
-        val currentTime = LocalTime.now() // Get current time
-        val formatter = DateTimeFormatter.ofPattern("HH:mm") // Define the desired format
+
+        val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle()
+        val currentTime = LocalTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
 
         val activeSleepTime = activeSleepCycle?.sleepTimes?.find { sleepTime ->
-            // sliight hack passing current time but hey :P, if it works, it works
             sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
         }
 
-        if (activeSleepTime != null){
-            startCountdown(Time.getTimeUntil(activeSleepTime.getEndTime()), "Sleep time ends in ")
+        if (activeSleepTime != null) {
+            val timeUntilEnd = TimeRange(activeSleepTime.startTime, activeSleepTime.calculateEndTime()).millisUntilEnd(currentTime.format(formatter))
+            startCountdown(timeUntilEnd, "Sleep time ends in ")
             return
         }
 
@@ -81,18 +84,13 @@ class ForegroundService : Service() {
 
         if (nextSleepTime != null) {
             val timeUntilNextSleep = calculateTimeUntilNextSleep(nextSleepTime)
-
-            startCountdown(timeUntilNextSleep,"Next sleep time in ")
+            startCountdown(timeUntilNextSleep, "Next sleep time in ")
         } else {
             Log.d("ForegroundService", "No upcoming sleep time found.")
-            stopSelf()
+            stopSelf() // Ensure to stop the service if no sleep times are available
         }
     }
 
-    // TODO: Make it so that it re-enables the notif, if the user toggles back the cycle
-    // TODO: Create active sleep time tracking in the notif
-    // ... i.e. if in sleep time, display time till end
-    // for now, that is it
 
     private fun startCountdown(timeUntil: Long, text: String) {
         countdownTimer = object : CountDownTimer(timeUntil, 1000) {
@@ -102,6 +100,7 @@ class ForegroundService : Service() {
 
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
+                Log.d("finished", "finished")
                 fetchAndUpdateSleepTimes()
             }
         }.start()
@@ -159,6 +158,7 @@ class ForegroundService : Service() {
             .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOngoing(true)
+            .setShowWhen(false)
             .build()
     }
 

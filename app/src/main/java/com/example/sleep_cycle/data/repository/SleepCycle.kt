@@ -17,8 +17,6 @@ class SleepCycleRepository@Inject constructor(
 
     private val dbHelper = SleepTimeDatabaseHelper(context)
 
-
-
     fun addSleepCycle(sleepCycle: SleepCycle): Long {
         val db = dbHelper.writableDatabase
         return try {

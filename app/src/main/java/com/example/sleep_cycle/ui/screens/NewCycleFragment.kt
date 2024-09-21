@@ -99,9 +99,11 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             }
 
             Button(
-                onClick = { showDialog.value = true },
+                onClick = {
+                    navController.navigateUp()
+                }
             ) {
-                Text("Add")
+                Text("Cancel")
             }
         }
 
