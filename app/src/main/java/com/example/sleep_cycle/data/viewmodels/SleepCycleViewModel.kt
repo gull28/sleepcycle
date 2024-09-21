@@ -78,8 +78,7 @@ class SleepCycleViewModel @Inject constructor(
             appContext.sendBroadcast(broadcastIntent)
         } else {
             // otherwise broadcast change
-            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-            appContext.sendBroadcast(broadcastIntent)
+            resetNotifAction()
         }
     }
 
@@ -122,8 +121,7 @@ class SleepCycleViewModel @Inject constructor(
 
             loadSleepTimes()
 
-            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-            appContext.sendBroadcast(broadcastIntent)
+            resetNotifAction()
             return
         }
 
@@ -136,13 +134,21 @@ class SleepCycleViewModel @Inject constructor(
     fun deleteSleepCycle(id: Long){
         val result = sleepCycleRepository.deleteSleepCycle(id)
 
-        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-        appContext.sendBroadcast(broadcastIntent)
+        if(id == activeSleepCycle.value?.id){
+            setActiveSleepCycle(null)
+        }
+
+        resetNotifAction()
         if(result){
             Log.d("SleepCycleViewModel", "Sleep cycle deleted successfully.")
             return
         }
         _errorMessage.value = "Error: Unable to delete sleep cycle."
+    }
+
+    fun resetNotifAction(){
+        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+        appContext.sendBroadcast(broadcastIntent)
     }
 
     fun getAllSleepCycles(): List<SleepCycle>? {
