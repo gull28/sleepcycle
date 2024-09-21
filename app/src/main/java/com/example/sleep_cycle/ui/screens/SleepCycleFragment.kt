@@ -54,11 +54,10 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             onEditClicked = { position, sleepTime ->
                 showDialog.value = true
                 selectedSleepTime.value = position
-
-                Log.d("sleeptimevalue", selectedSleepTime.value.toString())
             },
             onRemoveClicked = { position: Int, sleepTime: SleepTime ->
                 sleepTime.id?.let { viewModel.removeSleepTime(it) }
+                viewModel.resetNotifAction()
             }
         )
 
@@ -78,7 +77,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 }
             ){
                 Text(
-                    text = "Delete"
+                    text = "sasdad"
                 )
             }
 
@@ -97,6 +96,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 onSave = { sleepTime ->
                     handleSaveSleepTime(sleepTime, viewModel, context, selectedSleepTime.value, navController)
                     selectedSleepTime.value = null
+                    viewModel.resetNotifAction()
                 },
                 setShowDialog = {
                     showDialog.value = it
