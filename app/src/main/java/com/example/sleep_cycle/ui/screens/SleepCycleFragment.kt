@@ -77,7 +77,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 }
             ){
                 Text(
-                    text = "Delete"
+                    text = "sasdad"
                 )
             }
 
