@@ -21,6 +21,8 @@ import com.example.sleep_cycle.ui.components.SleepTimeList
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 
@@ -46,7 +48,12 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Cycle Name: ${sleepCycle?.name ?: "Unknown"}")
+        Text(
+            text = "${sleepCycle?.name ?: "Unknown"}",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black.copy(alpha = 0.6f)
+        )
 
         // Use the mutable version of sleepTimes for list operations
         SleepTimeList(
@@ -77,7 +84,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 }
             ){
                 Text(
-                    text = "sasdad"
+                    text = "Delete"
                 )
             }
 

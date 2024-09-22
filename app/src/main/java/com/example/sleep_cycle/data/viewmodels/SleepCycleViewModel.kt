@@ -166,11 +166,6 @@ class SleepCycleViewModel @Inject constructor(
         // find the active cycle
     }
 
-    fun resetNotifAction(){
-        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-        appContext.sendBroadcast(broadcastIntent)
-    }
-
     fun toggleActive(id: Long) {
         // find the sleepCycle
         val result = sleepCycleRepository.toggleActive(id)
@@ -185,6 +180,7 @@ class SleepCycleViewModel @Inject constructor(
             _errorMessage.value = "Error: Unable to toggle sleep cycle."
         }
     }
+
 
 
     private fun loadSleepTimes() {
