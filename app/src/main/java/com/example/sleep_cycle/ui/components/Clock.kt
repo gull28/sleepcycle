@@ -18,6 +18,7 @@ import kotlin.math.sin
 
 import androidx.compose.animation.core.*
 import androidx.compose.ui.graphics.Color
+import com.example.sleep_cycle.ui.theme.AppColors
 
 interface Vertices {
     var start: Int;
@@ -75,9 +76,6 @@ fun Clock(vertices: List<Vertice>?) {
             val startAngle = vertice.start.toFloat() - 90f
             val sweepAngle = animatedSweepAngles[index]
 
-            Log.d("vertice123123", vertice.start.toString())
-            Log.d("1235345345", vertice.end.toString())
-
             val isHandWithinVertice = if (vertice.start > vertice.end) {
                 (clockHandLocation >= vertice.start && clockHandLocation <= 360) ||
                         (clockHandLocation >= 0 && clockHandLocation <= vertice.end)
@@ -89,9 +87,9 @@ fun Clock(vertices: List<Vertice>?) {
 
 
             val sliceColor = if (isHandWithinVertice) {
-                Color(0xFFADDFBF).copy(alpha = pulseAlpha) // Pulsate color
+                AppColors.Primary.copy(alpha = pulseAlpha) // Pulsate color
             } else {
-                Color(0xFFADDFBF) // Normal color
+                AppColors.Primary
             }
 
             drawSlice(size = size, startAngle = startAngle, sweepAngle = sweepAngle, color = sliceColor)
@@ -103,7 +101,7 @@ fun Clock(vertices: List<Vertice>?) {
 
 fun DrawScope.drawClockFace(size: Size) {
     drawCircle(
-        color = Color.Gray,
+        color = AppColors.ClockFace,
         radius = size.minDimension / 2 * 0.85f,
         center = Offset(size.width / 2, size.height / 2)
     )
@@ -128,7 +126,7 @@ fun DrawScope.drawClockHand(size: Size, angle: Double) {
     )
 
     drawLine(
-        color = Color.Black,
+        color = AppColors.Slate,
         start = center,
         end = handEnd,
         strokeWidth = 3.2.dp.toPx()
@@ -147,3 +145,4 @@ fun DrawScope.drawSlice(size: Size, startAngle: Float, sweepAngle: Float, color:
         size = Size(radius * 2, radius * 2)
     )
 }
+

@@ -33,7 +33,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import android.app.ActivityManager
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
+import com.example.sleep_cycle.ui.theme.AppColors
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -41,13 +43,15 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.statusBarColor = (AppColors.Background.toArgb())
+        }
 
         setContent {
 
             Surface(
                 modifier = Modifier.fillMaxSize().fillMaxHeight(),
-                color = MaterialTheme.colorScheme.background
+                color = AppColors.Background
             ) {
                 val navController = rememberNavController()
                 MainScreen(navController)

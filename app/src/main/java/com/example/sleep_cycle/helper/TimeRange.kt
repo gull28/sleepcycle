@@ -1,6 +1,8 @@
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import java.util.Calendar
+import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TimeRange(private val startTimeStr: String, private val endTimeStr: String) {
@@ -54,6 +56,7 @@ class TimeRange(private val startTimeStr: String, private val endTimeStr: String
         val durationInMillis = durationInMinutes * 60 * 1000L
         return durationInMillis
     }
+
 
     override fun toString(): String {
         return "TimeRange(startTime=$startTimeStr, endTime=$endTimeStr)"

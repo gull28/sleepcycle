@@ -8,11 +8,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +36,7 @@ import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.ui.theme.AppColors
 
 
 @Composable
@@ -44,7 +48,6 @@ fun SleepCycleList(
 ) {
     val listCount = remember { mutableIntStateOf(limit) }
 
-    // Observe the active sleep cycle from the ViewModel
     val activeSleepCycle by sleepCycleViewModel.activeSleepCycle.observeAsState()
 
     var mutatedSleepCycles = sleepCycles
@@ -108,7 +111,8 @@ fun SleepCycleItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable(onClick = onClick),
-        color = MaterialTheme.colorScheme.surface,
+        color = AppColors.Accent,
+        shape = RoundedCornerShape(13.dp),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -120,12 +124,15 @@ fun SleepCycleItem(
             ) {
                 Text(
                     text = sleepCycle.name,
+                    color = AppColors.TextPrimary,
                     style = MaterialTheme.typography.bodyMedium
                 )
 
                 Text(
                     text = "Sleep time ${Time.minutesToHHMM(sleepCycle.totalSleepTime())}",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                    color = AppColors.TextSecondary
                 )
             }
 
@@ -137,7 +144,9 @@ fun SleepCycleItem(
                     sleepCycle.id?.let {
                         onToggleActive(sleepCycle)
                     }
-                }
+                },
+                colors = SwitchDefaults.colors(checkedThumbColor = AppColors.Primary, checkedTrackColor = AppColors.Slate)
+
             )
         }
     }

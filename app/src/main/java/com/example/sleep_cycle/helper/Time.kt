@@ -4,6 +4,7 @@ package com.example.sleep_cycle.helper
 import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -26,6 +27,10 @@ class Time(private val minutes: Int) {
 
         fun HHMMtoMinutes(strTime : String): Int {
             return 0
+        }
+
+        fun getCurrentTime(): Date {
+            return Calendar.getInstance().time
         }
 
         fun getTimeUntil(timeInFuture: Calendar): Long {

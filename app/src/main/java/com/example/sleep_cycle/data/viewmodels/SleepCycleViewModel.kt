@@ -74,12 +74,10 @@ class SleepCycleViewModel @Inject constructor(
             val serviceIntent = Intent(appContext, ForegroundService::class.java)
             ContextCompat.startForegroundService(appContext, serviceIntent)
 
-            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-            appContext.sendBroadcast(broadcastIntent)
+            resetNotifAction()
         } else {
             // otherwise broadcast change
-            val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-            appContext.sendBroadcast(broadcastIntent)
+            resetNotifAction()
         }
     }
 
@@ -159,6 +157,11 @@ class SleepCycleViewModel @Inject constructor(
         return _sleepCycles.value;
 
         // find the active cycle
+    }
+
+    fun resetNotifAction(){
+        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
+        appContext.sendBroadcast(broadcastIntent)
     }
 
     fun toggleActive(id: Long) {

@@ -1,22 +1,20 @@
-// SleepTimeList.kt
 package com.example.sleep_cycle.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.helper.Time
 
 @Composable
 fun SleepTimeList(
@@ -28,7 +26,7 @@ fun SleepTimeList(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(top = 80.dp)
+            .padding(vertical = 24.dp)
     ) {
         sleepTimes.forEachIndexed { index, sleepTime ->
             SleepTimeItem(
@@ -36,10 +34,10 @@ fun SleepTimeList(
                 onEditClicked = { onEditClicked(index, sleepTime) },
                 onRemoveClicked = { onRemoveClicked(index, sleepTime) }
             )
+            Spacer(modifier = Modifier.height(12.dp)) // Added space between items
         }
     }
 }
-
 
 @Composable
 fun SleepTimeItem(
@@ -47,23 +45,56 @@ fun SleepTimeItem(
     onEditClicked: () -> Unit,
     onRemoveClicked: () -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .wrapContentHeight(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+        shape = RoundedCornerShape(8.dp), // Added rounded corners
+        elevation = CardDefaults.cardElevation(4.dp) // Added elevation
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Start Time: ${sleepTime.startTime}", fontSize = 16.sp)
-            Text(text = "Duration: ${sleepTime.duration}", fontSize = 14.sp)
-            Text(text = "Name: ${sleepTime.name}", fontSize = 14.sp)
-        }
-
-        Row {
-            IconButton(onClick = onEditClicked) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Sleep Time")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = "Start Time: ${sleepTime.startTime}",
+                    fontSize = 18.sp,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Duration: ${Time.minutesToHHMM(sleepTime.duration)}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Name: ${sleepTime.name}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
             }
-            IconButton(onClick = onRemoveClicked) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Remove Sleep Time")
+
+            Row(
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                IconButton(
+                    onClick = onEditClicked,
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Blue)
+                ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Sleep Time")
+                }
+                IconButton(
+                    onClick = onRemoveClicked,
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Red)
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Remove Sleep Time")
+                }
             }
         }
     }
