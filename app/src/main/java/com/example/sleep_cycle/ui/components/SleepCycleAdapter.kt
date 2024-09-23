@@ -109,7 +109,7 @@ fun SleepCycleItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 5.dp)
             .clickable(onClick = onClick),
         color = AppColors.Accent,
         shape = RoundedCornerShape(13.dp),

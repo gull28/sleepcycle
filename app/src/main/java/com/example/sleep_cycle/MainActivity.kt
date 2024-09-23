@@ -50,7 +50,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             Surface(
-                modifier = Modifier.fillMaxSize().fillMaxHeight(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxHeight(),
                 color = AppColors.Background
             ) {
                 val navController = rememberNavController()
@@ -116,7 +118,7 @@ fun CustomTopAppBar(
     showBackButton: Boolean
 ) {
     TopAppBar(
-        modifier = Modifier.padding(bottom = 10.dp),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.Background, titleContentColor = AppColors.Slate),
         title = { Text(text = "Your App Name") },
         navigationIcon = {
             if (showBackButton) {
@@ -126,7 +128,7 @@ fun CustomTopAppBar(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_custom_back_button),
                         contentDescription = "Back",
-                        tint = Color.Black
+                        tint = AppColors.Slate
                     )
                 }
             }

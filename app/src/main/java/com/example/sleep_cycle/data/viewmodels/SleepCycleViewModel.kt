@@ -43,8 +43,8 @@ class SleepCycleViewModel @Inject constructor(
     val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
 
     // this is selected  sleep cycle
-    private val _sleepCycle = MutableLiveData<SleepCycle>()
-    val sleepCycle: LiveData<SleepCycle> get() = _sleepCycle
+    private val _sleepCycle = MutableLiveData<SleepCycle?>()
+    val sleepCycle: MutableLiveData<SleepCycle?> get() = _sleepCycle
 
     // this is for active sleep cycle (toggled on)
     private val _activeSleepCycle = MutableLiveData<SleepCycle?>()
@@ -159,6 +159,17 @@ class SleepCycleViewModel @Inject constructor(
 
             if (activeCycle != null)
                 _activeSleepCycle.value = activeCycle
+
+            if(sleepCycle.value != null){
+                val selectedSleepCycle = cycles.find { it.id == sleepCycle.value!!.id }
+
+                if (selectedSleepCycle != null){
+                    _sleepCycle.value = selectedSleepCycle
+                    _sleepTimes.value = selectedSleepCycle.sleepTimes.toMutableList()
+
+                }
+
+            }
         }
 
         return _sleepCycles.value;

@@ -53,7 +53,10 @@ dependencies {
 
     implementation(libs.androidx.core.ktx.v1101)
     implementation(libs.androidx.work.runtime)
-    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
+    implementation(libs.androidx.localbroadcastmanager)
+    implementation(libs.material3) // Check for the latest version
+    implementation(libs.androidx.material.icons.extended)
+
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)

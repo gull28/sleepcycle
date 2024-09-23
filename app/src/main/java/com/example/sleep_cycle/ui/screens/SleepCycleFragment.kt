@@ -9,6 +9,14 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
+import com.example.sleep_cycle.ui.components.Clock
+import com.example.sleep_cycle.ui.theme.AppColors
 
 @Composable
 @RequiresApi(Build.VERSION_CODES.O)
@@ -32,7 +42,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
     val context = LocalContext.current
 
     val sleepTimesState = viewModel.sleepTimes.observeAsState()
-    val sleepTimes = sleepTimesState.value?.toMutableList() ?: mutableListOf() // Convert to a mutable list
+    val sleepTimes = sleepTimesState.value?.toMutableList() ?: mutableListOf()
 
     val sleepCycle by viewModel.sleepCycle.observeAsState()
     val errorMessage by viewModel.errorMessage.observeAsState()
@@ -47,52 +57,98 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            text = "${sleepCycle?.name ?: "Unknown"}",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black.copy(alpha = 0.6f)
-        )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = AppColors.Background)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Main content
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
+        ) {
+            Clock(vertices = sleepCycle!!.getSleepTimeVertices())
 
-        // Use the mutable version of sleepTimes for list operations
-        SleepTimeList(
-            sleepTimes = sleepTimes,
-            onEditClicked = { position, sleepTime ->
-                showDialog.value = true
-                selectedSleepTime.value = position
-            },
-            onRemoveClicked = { position: Int, sleepTime: SleepTime ->
-                sleepTime.id?.let { viewModel.removeSleepTime(it) }
-                viewModel.resetNotifAction()
-            }
-        )
+            Text(
+                text = sleepCycle?.name ?: "Unknown",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.Slate,
+                modifier = Modifier.align(Alignment.Start)
+            )
 
-        Button(onClick = { showDialog.value = true }) {
-            Text("Add Time")
+            SleepTimeList(
+                sleepTimes = sleepTimes,
+                onEditClicked = { position, sleepTime ->
+                    showDialog.value = true
+                    selectedSleepTime.value = position
+                },
+                onRemoveClicked = { _, sleepTime ->
+                    sleepTime.id?.let { viewModel.removeSleepTime(it) }
+
+                    // Refetch and update
+                    viewModel.resetNotifAction()
+                    viewModel.getAllSleepCycles()
+                }
+            )
         }
 
-        Row(modifier = Modifier.align(Alignment.End)) {
-            
+        Row(
+            modifier = Modifier.padding(bottom = 20.dp)
+        ) {
             Button(
-                colors = ButtonDefaults.buttonColors(Color.Red),
-                modifier = Modifier.padding(horizontal = 10.dp),
-                onClick = {
-                    sleepCycle?.id?.let { viewModel.deleteSleepCycle(id = it) }
-
-                    navController.navigate("home")
+                onClick = { /* Handle delete logic */ },
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                contentPadding = PaddingValues(vertical = 18.dp),
+                shape = RoundedCornerShape(13.dp),
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .fillMaxWidth(0.5f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = AppColors.Slate
+                    )
+                    Text(
+                        letterSpacing = 1.1.sp,
+                        fontWeight = FontWeight(385),
+                        fontSize = 16.sp,
+                        text = "Delete"
+                    )
                 }
-            ){
-                Text(
-                    text = "Delete"
-                )
             }
 
             Button(
-                onClick = {
-                    navController.navigateUp()
-            }) {
-                Text("Done")
+                onClick = { showDialog.value = true },
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                contentPadding = PaddingValues(vertical = 18.dp),
+                shape = RoundedCornerShape(13.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Done",
+                        tint = AppColors.Slate
+                    )
+                    Text(
+                        letterSpacing = 1.1.sp,
+                        fontWeight = FontWeight(385),
+                        fontSize = 16.sp,
+                        text = "Add time"
+                    )
+                }
             }
         }
 
@@ -117,6 +173,9 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
     }
 }
 
+
+
+
 @RequiresApi(Build.VERSION_CODES.O)
 private fun handleSaveSleepTime(
     sleepTime: SleepTime,
@@ -132,7 +191,8 @@ private fun handleSaveSleepTime(
         // Edit route]
         val res = repository.updateSleepTime(sleepTime)
 
-        navController.navigate("home")
+        viewModel.getAllSleepCycles()
+
     } else {
         // Add route
         val overlappingTime = viewModel.sleepTimes.value?.find {
@@ -147,11 +207,13 @@ private fun handleSaveSleepTime(
             val scheduleId = viewModel.sleepCycle.value?.id
             if (scheduleId != null) {
                 repository.addSleepTime(sleepTime, scheduleId)
+
+                viewModel.getAllSleepCycles()
             }
-            navController.navigate("home")
         } else {
             Toast.makeText(context, "A SleepTime with the same start time already exists.", Toast.LENGTH_SHORT).show()
         }
     }
 }
+
 

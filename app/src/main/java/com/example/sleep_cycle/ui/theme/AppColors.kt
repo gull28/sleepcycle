@@ -8,7 +8,7 @@ object AppColors {
     val TextPrimary = Color(0xFFEDF1F7)
     val TextSecondary = Color(0xFF717177)
     val Background = Color(0xFF000000)
-    val Accent = Color(0xFF1D1D20)
+    val Accent = Color(0xFF1B1B1D)
     val ClockFace = Color(0xFF07293F)
     val Button = Color(0xFF0F3D5C)
     val Slate = Color( 0xFfe2e8f0)
