@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation(libs.hilt.android)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
     kapt(libs.hilt.android.compiler)
 
     implementation(libs.androidx.core.ktx.v1101)
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.material3) // Check for the latest version
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.datastore.preferences)
 
 
     implementation(libs.androidx.hilt.navigation.compose)

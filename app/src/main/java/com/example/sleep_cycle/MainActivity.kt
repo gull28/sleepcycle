@@ -119,7 +119,7 @@ fun CustomTopAppBar(
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = AppColors.Background, titleContentColor = AppColors.Slate),
-        title = { Text(text = "Your App Name") },
+        title = { Text(text = "") },
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = {

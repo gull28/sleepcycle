@@ -12,4 +12,5 @@ object AppColors {
     val ClockFace = Color(0xFF07293F)
     val Button = Color(0xFF0F3D5C)
     val Slate = Color( 0xFfe2e8f0)
+    val DialogBackGround = Color(0xFF181717)
 }

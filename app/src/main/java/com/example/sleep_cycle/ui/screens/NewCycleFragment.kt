@@ -2,7 +2,10 @@ package com.example.sleep_cycle.ui.screens
 
 import TimeInputDialog
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.ui.*
 import androidx.compose.foundation.layout.*
@@ -33,7 +36,7 @@ import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import com.example.sleep_cycle.ui.theme.AppColors
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewModel) {
     val sleepTimes = remember { mutableStateListOf<SleepTime>() }
@@ -69,7 +72,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             OutlinedTextField(
                 label = { Text("Name")},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = AppColors.Primary.copy(alpha = 0.75f),
+                    unfocusedBorderColor = AppColors.Slate.copy(alpha = 0.75f),
                     focusedBorderColor = AppColors.Primary,
                     focusedLabelColor = AppColors.TextPrimary,
                     unfocusedTextColor = AppColors.TextPrimary,
@@ -111,7 +114,13 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 onClick = {
                     try{
                         val sleepCycle = SleepCycle(name = name.value, sleepTimes = sleepTimes, isActive = 0)
-                        val res = sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
+
+                        if(sleepCycle.name.isEmpty()){
+                            Toast.makeText(localContext, "Please enter the correct name", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
+                        sleepCycleRepository.addSleepCycle(sleepCycle = sleepCycle)
                         navController.navigate("home")
                     }catch (e: Exception){
                         Log.e("exceptionally bad", e.message.toString())
@@ -150,7 +159,6 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     Icon(
                         imageVector = Icons.Default.Timelapse, // Material 3 edit icon
                         contentDescription = "Add time",
@@ -172,11 +180,29 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 sleepTime = currentSleepTime,
                 setShowDialog = { showDialog.value = it },
                 onSave = { newSleepTime ->
+
+                    val isValidSleepTime = sleepTimes.find { time ->
+                        newSleepTime.isTimeInTimeFrame(time.startTime, time.calculateEndTime())
+                    }
+
+                    val isValidName = newSleepTime.name.isNotEmpty() && sleepTimes.none { it.name == newSleepTime.name }
+
+                    if(!isValidName){
+                        Toast.makeText(localContext, "Please fill name correctly", Toast.LENGTH_SHORT).show()
+                        return@TimeInputDialog
+                    }
+
+                    if(isValidSleepTime != null){
+                        Toast.makeText(localContext, "Please don't use overlapping sleep times", Toast.LENGTH_SHORT).show()
+                        return@TimeInputDialog
+                    }
+
                     selectedSleepTime.value?.let { index ->
                         sleepTimes[index] = newSleepTime
                     } ?: run {
                         sleepTimes.add(newSleepTime)
                     }
+
                 },
                 onDismiss = { showDialog.value = false }
             )
@@ -190,6 +216,13 @@ private fun onSaveClicked(
     context: Context,
     navController: NavController
 ) {
+    if(name.isEmpty()){
+        Toast.makeText(context, "Please don't use overlapping sleep times", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+
+
 }
 
 

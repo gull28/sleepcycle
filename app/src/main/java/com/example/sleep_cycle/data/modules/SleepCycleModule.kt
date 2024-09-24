@@ -3,6 +3,7 @@ package com.example.sleep_cycle.data.modules
 
 import android.app.Application
 import android.content.Context
+import com.example.sleep_cycle.data.repository.Preference
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import dagger.Module
@@ -21,6 +22,12 @@ object SleepCycleModule {
         @ApplicationContext context: Context
     ): SleepCycleRepository {
         return SleepCycleRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStoreManager(@ApplicationContext context: Context): Preference {
+        return Preference(context)
     }
 
     @Provides

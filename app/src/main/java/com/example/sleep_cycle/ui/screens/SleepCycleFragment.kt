@@ -65,7 +65,6 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Main content
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
@@ -100,7 +99,11 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             modifier = Modifier.padding(bottom = 20.dp)
         ) {
             Button(
-                onClick = { /* Handle delete logic */ },
+                onClick = {
+                    sleepCycle?.id?.let { viewModel.deleteSleepCycle(it) }
+
+                    navController.navigateUp()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
                 contentPadding = PaddingValues(vertical = 18.dp),
                 shape = RoundedCornerShape(13.dp),
@@ -192,7 +195,6 @@ private fun handleSaveSleepTime(
         val res = repository.updateSleepTime(sleepTime)
 
         viewModel.getAllSleepCycles()
-
     } else {
         // Add route
         val overlappingTime = viewModel.sleepTimes.value?.find {

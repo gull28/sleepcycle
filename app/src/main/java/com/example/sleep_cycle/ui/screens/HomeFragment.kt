@@ -2,51 +2,67 @@ package com.example.sleep_cycle.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.sleep_cycle.data.repository.Preference
+import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
-import com.example.sleep_cycle.ui.components.SleepCycleList
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.text.font.FontWeight
 import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.components.Clock
+import com.example.sleep_cycle.ui.components.SleepCycleList
 import com.example.sleep_cycle.ui.theme.AppColors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
-    // Observe sleepCycles and activeSleepCycle from the ViewModel
+fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, preferences: PreferenceViewModel) {
     viewModel.getAllSleepCycles()
     val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList()) // Observe list of cycles
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
+    val mode = preferences.modeFlow.collectAsState(initial = true)
 
-    // Loading state
     var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect(sleepCycles) {
         isLoading = false
     }
 
-    val nextCycle = activeSleepCycle?.getNextSleepTime()
-
-    Log.d("nextCyc", nextCycle.toString())
-    val timeUntilNextSleepTime = nextCycle?.startTime?.let {
-        Time.stringToDateObj(
-            it
-        )
-    }?.let { Time.getTimeUntil(it) }
-
-    Log.d("timeUntilNextSleepTime", timeUntilNextSleepTime.toString())
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +72,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -64,25 +80,20 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = "Clock/Timer",
-                    color = AppColors.Slate,
-                    fontWeight = FontWeight(400),
-                    fontSize = 16.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Switch(
-                    checked = true,
-                    onCheckedChange = {
-                        // Handle switch state change
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = AppColors.Primary,
-                        checkedTrackColor = AppColors.Slate
+
+                IconButton(onClick = {
+                    navController.navigate("")
+                },
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = AppColors.Primary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Edit Sleep Time",
+                        modifier = Modifier.size(28.dp)
                     )
-                )
+                }
             }
 
 
@@ -142,7 +153,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier
@@ -157,7 +168,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
                     shape = RoundedCornerShape(13.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 10.dp)
                 ) {
 
                     Row(
@@ -180,13 +191,11 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
 
             SleepCycleList(
                 sleepCycles = sleepCycles,
                 navController = navController,
                 sleepCycleViewModel = viewModel,
-                limit = 3
             )
         }
     }

@@ -17,6 +17,6 @@ fun SleepCycleListFragment(navController: NavController, viewModel: SleepCycleVi
 
     val sleepCycles = sleepCycleRepository.getAllSleepCycles()
     Column {
-        SleepCycleList(sleepCycles =sleepCycles , navController = navController, sleepCycleViewModel = viewModel, limit = 0)
+        SleepCycleList(sleepCycles =sleepCycles , navController = navController, sleepCycleViewModel = viewModel)
     }
 }

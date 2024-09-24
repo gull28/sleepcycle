@@ -1,6 +1,7 @@
 import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -8,6 +9,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.ui.theme.AppColors
 import java.util.*
 
 @Composable
@@ -44,58 +46,106 @@ fun TimeInputDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Sleep Time") },
+        containerColor = AppColors.DialogBackGround,
+        title = {
+            Text(
+                "Add Sleep Time",
+                style = MaterialTheme.typography.titleLarge,
+                color = AppColors.TextPrimary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = AppColors.Slate.copy(alpha = 0.75f),
+                        focusedBorderColor = AppColors.Primary,
+                        focusedLabelColor = AppColors.TextPrimary,
+                        unfocusedTextColor = AppColors.TextPrimary,
+                        unfocusedLabelColor = AppColors.TextPrimary.copy(alpha = 0.75f),
+                        focusedTextColor = AppColors.TextPrimary,
+                    )
                 )
 
                 Button(
                     onClick = { openStartTimePicker() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppColors.Primary
+                    ),
+                    contentPadding = PaddingValues(16.dp)
                 ) {
-                    Text("Start Time: $startTime")
+                    Text("Start Time: $startTime", style = MaterialTheme.typography.bodyLarge)
                 }
 
                 Button(
                     onClick = { openDurationPicker() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppColors.Primary
+                    ),
+                    contentPadding = PaddingValues(16.dp)
                 ) {
                     val durationHours = duration / 60
                     val durationMinutes = duration % 60
-                    Text("Duration: ${String.format("%02d:%02d", durationHours, durationMinutes)}")
+                    Text(
+                        "Duration: ${String.format("%02d:%02d", durationHours, durationMinutes)}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         },
         confirmButton = {
-            Button(onClick = {
-                if (name.text.isNotBlank() && duration > 0 && duration < 1440) {
-                    val sleepTime = SleepTime(
-                        id = sleepTime?.id,
-                        scheduleId = sleepTime?.scheduleId,
-                        name = name.text,
-                        startTime = startTime,
-                        duration = duration
-                    )
-                    onSave(sleepTime)
-                    onDismiss()
-                } else {
-                    Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
-                }
-            }) {
-                Text("Save")
+            Button(
+                onClick = {
+                    if (name.text.isNotBlank() && duration > 0 && duration < 1440) {
+                        val sleepTime = SleepTime(
+                            id = sleepTime?.id,
+                            scheduleId = sleepTime?.scheduleId,
+                            name = name.text,
+                            startTime = startTime,
+                            duration = duration
+                        )
+                        onSave(sleepTime)
+                        onDismiss()
+                    } else {
+                        Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .padding(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppColors.Primary
+                ),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+            ) {
+                Text("Save", style = MaterialTheme.typography.labelLarge, color = AppColors.Slate)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .padding(8.dp),  // Ensure padding is similar to the "Save" button
+            ) {
+                Text("Cancel", color = AppColors.Slate)
             }
-        }
+        },
+        shape = RoundedCornerShape(16.dp),
     )
+
 }
+

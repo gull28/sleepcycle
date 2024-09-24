@@ -73,7 +73,7 @@ fun SleepTimeItem(
             ) {
                 Text(
                     modifier = Modifier.padding(bottom = 4.dp),
-                    text = "Name: ${sleepTime.name}",
+                    text = sleepTime.name,
                     color = AppColors.Slate,
                     fontSize = 16.sp,
                     style = MaterialTheme.typography.bodyMedium
