@@ -1,5 +1,6 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,20 +26,30 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier) {
         navController = navController,
         startDestination = "home",
         route = "main_graph",
-        modifier = modifier
+        modifier = modifier,
+
         ) {
-        composable("home") {
+        composable(
+            "home",
+            enterTransition = null,
+            exitTransition = null,
+        ) {
             HomeScreen(navController = navController, viewModel = viewModel, preferences = preferences)
         }
-        composable("detailsScreen") {
+        composable("detailsScreen",
+            enterTransition = null,
+            exitTransition = null,) {
             SleepCycleScreen(navController = navController, viewModel = viewModel)
         }
-        composable("newCycleScreen") {
+        composable("newCycleScreen",
+            enterTransition = null,
+            exitTransition = null,) {
             NewCycleFragment(navController = navController, viewModel = viewModel)
         }
-        composable("settingsScreen"){
+        composable("settingsScreen",
+            enterTransition = null,
+            exitTransition = null){
             Settings(navController = navController, preferences = preferences)
         }
-
     }
 }

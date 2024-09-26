@@ -54,7 +54,6 @@ class ForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForegroundServiceWithNotification()
 
-        // Fetch the upcoming sleep time and start the timer
         fetchAndUpdateSleepTimes()
 
         return START_STICKY
@@ -62,8 +61,6 @@ class ForegroundService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchAndUpdateSleepTimes() {
-        // Cancel previous countdown if it's running
-        Log.d("fetchnupdate", "1233123")
         countdownTimer?.cancel()
 
         val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle()

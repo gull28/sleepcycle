@@ -36,7 +36,6 @@ class Time(private val minutes: Int) {
         fun getTimeUntil(timeInFuture: Calendar): Long {
             val currentTime = Calendar.getInstance()
 
-            Log.d("currentTime", currentTime.toString())
             if (timeInFuture.before(currentTime)) {
                 timeInFuture.add(Calendar.DATE, 1)
             }

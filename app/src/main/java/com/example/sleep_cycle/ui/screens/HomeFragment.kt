@@ -1,6 +1,8 @@
 package com.example.sleep_cycle.ui.screens
 
-import android.util.Log
+import TimeRange
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,18 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,14 +41,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.sleep_cycle.data.repository.Preference
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
-import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepCycleList
+import com.example.sleep_cycle.ui.components.Timer
 import com.example.sleep_cycle.ui.theme.AppColors
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, preferences: PreferenceViewModel) {
     viewModel.getAllSleepCycles()
@@ -59,6 +58,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
     val mode = preferences.modeFlow.collectAsState(initial = true)
 
     var isLoading by remember { mutableStateOf(true) }
+
     LaunchedEffect(sleepCycles) {
         isLoading = false
     }
@@ -84,7 +84,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
             ) {
 
                 IconButton(onClick = {
-                    navController.navigate("")
+                    navController.navigate("settingsScreen")
                 },
                     colors = IconButtonDefaults.iconButtonColors(contentColor = AppColors.Primary)
                 ) {
@@ -96,8 +96,6 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                 }
             }
 
-
-
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -105,7 +103,12 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                         .align(Alignment.CenterHorizontally)
                 )
             } else if (activeSleepCycle != null && activeSleepCycle!!.sleepTimes.isNotEmpty()) {
-                Clock(vertices = activeSleepCycle!!.getSleepTimeVertices())
+                if(mode.value){
+                    Timer(cycle = activeSleepCycle!!)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }else{
+                    Clock(vertices = activeSleepCycle!!.getSleepTimeVertices())
+                }
             }else if (activeSleepCycle == null){
                 Text(
                     text = "No active sleep cycle found.",
