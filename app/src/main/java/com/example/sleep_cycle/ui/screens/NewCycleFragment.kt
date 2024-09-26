@@ -181,6 +181,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 setShowDialog = { showDialog.value = it },
                 onSave = { newSleepTime ->
 
+                    Log.d("newsleeptime", newSleepTime.toString())
                     val isValidSleepTime = sleepTimes.find { time ->
                         newSleepTime.isTimeInTimeFrame(time.startTime, time.calculateEndTime())
                     }

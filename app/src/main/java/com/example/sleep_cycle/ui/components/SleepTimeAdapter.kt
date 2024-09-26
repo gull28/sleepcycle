@@ -80,7 +80,7 @@ fun SleepTimeItem(
                 )
 
                 Text(
-                    text = "Start Time: ${sleepTime.startTime}",
+                    text = "Start Time: ${sleepTime.startTime.substring(0, 5)}",
                     fontSize = 14.sp,
                     color = AppColors.TextSecondary,
                     style = MaterialTheme.typography.bodyMedium

@@ -27,7 +27,7 @@ import javax.inject.Inject
 class ForegroundService : Service() {
 
     @Inject
-    lateinit var sleepCycleRepository: SleepCycleRepository // Inject the repository
+    lateinit var sleepCycleRepository: SleepCycleRepository
 
     private var countdownTimer: CountDownTimer? = null
 
@@ -65,7 +65,7 @@ class ForegroundService : Service() {
 
         val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle()
         val currentTime = LocalTime.now()
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
         val activeSleepTime = activeSleepCycle?.sleepTimes?.find { sleepTime ->
             sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
