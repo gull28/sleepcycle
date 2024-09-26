@@ -15,9 +15,17 @@ class PreferenceViewModel @Inject constructor(
 
     val modeFlow: Flow<Boolean> = preference.modeFlow
 
-     fun saveMode(value: Boolean){
-         viewModelScope.launch {
-             preference.saveMode(value)
-         }
+    val notificationPermissionFlow: Flow<Boolean> = preference.notificationPermissionFlow
+
+    fun saveMode(value: Boolean) {
+        viewModelScope.launch {
+            preference.saveMode(value)
+        }
+    }
+
+    fun saveNotificationPermission(isGranted: Boolean) {
+        viewModelScope.launch {
+            preference.saveNotificationPermission(isGranted)
+        }
     }
 }

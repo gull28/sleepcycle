@@ -48,7 +48,7 @@ fun SleepCycleList(
                 isActive = activeSleepCycle?.id == sleepCycle.id,
                 onClick = {
                     sleepCycleViewModel.setSleepCycle(sleepCycle)
-                    navController.navigate("detailsScreen")
+                    navController.navigate("sleepCycleScreen")
                 },
                 onToggleActive = { cycle ->
                     val isCurrentlyActive = activeSleepCycle?.id == cycle.id

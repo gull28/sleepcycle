@@ -36,7 +36,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier) {
         ) {
             HomeScreen(navController = navController, viewModel = viewModel, preferences = preferences)
         }
-        composable("detailsScreen",
+        composable("sleepCycleScreen",
             enterTransition = null,
             exitTransition = null,) {
             SleepCycleScreen(navController = navController, viewModel = viewModel)

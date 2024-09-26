@@ -118,7 +118,7 @@ fun TimeInputDialog(
                             scheduleId = sleepTime?.scheduleId,
                             name = name.text,
                             // Save startTime with seconds as "HH:mm:ss"
-                            startTime = "$startTime",
+                            startTime = startTime,
                             duration = duration
                         )
                         onSave(sleepTime)
@@ -142,7 +142,7 @@ fun TimeInputDialog(
             TextButton(
                 onClick = onDismiss,
                 modifier = Modifier
-                    .padding(8.dp),  // Ensure padding is similar to the "Save" button
+                    .padding(8.dp),
             ) {
                 Text("Cancel", color = AppColors.Slate)
             }

@@ -191,7 +191,7 @@ private fun handleSaveSleepTime(
     val repository = SleepTimeRepository(context)
 
     if (selectedSleepTime != null) {
-        // Edit route]
+        // Edit route
         val res = repository.updateSleepTime(sleepTime)
 
         viewModel.getAllSleepCycles()

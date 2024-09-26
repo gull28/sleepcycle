@@ -120,7 +120,6 @@ class SleepCycleRepository@Inject constructor(
     fun toggleActive(id: Long): Boolean {
         val db = dbHelper.writableDatabase
 
-        Log.d("toggling", "123")
         return try {
             db.beginTransaction()
 
@@ -131,7 +130,6 @@ class SleepCycleRepository@Inject constructor(
             // Check if the cursor has any results and move to the first row
             if (currentActiveCursor.moveToFirst()) {
                 activeId = currentActiveCursor.getLong(currentActiveCursor.getColumnIndexOrThrow("id"))
-                Log.d("ToggleActive", "Currently active ID: $activeId")
 
                 if (activeId != id) {
                     db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(activeId))
@@ -139,7 +137,6 @@ class SleepCycleRepository@Inject constructor(
             }
             currentActiveCursor.close()
 
-            // Toggle the passed id: if it's already active, deactivate it; otherwise, activate it
             if (activeId == id) {
                 db.execSQL("UPDATE SleepCycles SET isActive = 0 WHERE id = ?", arrayOf(id))
             } else {
@@ -192,8 +189,6 @@ class SleepCycleRepository@Inject constructor(
             cursor.close()
             db.close()
         }
-
-        cursor.close()
     }
 
 

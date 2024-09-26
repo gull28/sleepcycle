@@ -41,7 +41,7 @@ fun SleepTimeList(
                 onEditClicked = { onEditClicked(index, sleepTime) },
                 onRemoveClicked = { onRemoveClicked(index, sleepTime) }
             )
-            Spacer(modifier = Modifier.height(12.dp)) // Space between items
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

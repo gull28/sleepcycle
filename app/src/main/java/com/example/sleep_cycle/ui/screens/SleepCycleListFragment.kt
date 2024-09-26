@@ -11,7 +11,6 @@ import com.example.sleep_cycle.ui.components.SleepCycleList
 @Composable
 
 fun SleepCycleListFragment(navController: NavController, viewModel: SleepCycleViewModel) {
-
     val context = LocalContext.current
     val sleepCycleRepository = SleepCycleRepository(context)
 

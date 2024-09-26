@@ -134,9 +134,9 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 ) {
 
                     Icon(
-                        imageVector = Icons.Default.Add, // Material 3 edit icon
+                        imageVector = Icons.Default.Add,
                         contentDescription = "Save",
-                        tint = AppColors.Slate // Optional: Change color
+                        tint = AppColors.Slate
                     )
                     Text(
                         letterSpacing = 1.1.sp,
@@ -160,9 +160,9 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Timelapse, // Material 3 edit icon
+                        imageVector = Icons.Default.Timelapse,
                         contentDescription = "Add time",
-                        tint = AppColors.Slate // Optional: Change color
+                        tint = AppColors.Slate
                     )
                     Text(
                         letterSpacing = 1.1.sp,
@@ -181,7 +181,6 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                 setShowDialog = { showDialog.value = it },
                 onSave = { newSleepTime ->
 
-                    Log.d("newsleeptime", newSleepTime.toString())
                     val isValidSleepTime = sleepTimes.find { time ->
                         newSleepTime.isTimeInTimeFrame(time.startTime, time.calculateEndTime())
                     }
@@ -209,21 +208,6 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             )
         }
     }
-}
-
-private fun onSaveClicked(
-    name: String,
-    sleepTimes: List<SleepTime>,
-    context: Context,
-    navController: NavController
-) {
-    if(name.isEmpty()){
-        Toast.makeText(context, "Please don't use overlapping sleep times", Toast.LENGTH_SHORT).show()
-        return
-    }
-
-
-
 }
 
 

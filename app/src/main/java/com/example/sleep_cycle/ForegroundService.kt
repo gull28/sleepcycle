@@ -98,8 +98,7 @@ class ForegroundService : Service() {
             val timeUntilNextSleep = calculateTimeUntilNextSleep(nextSleepTime)
             startCountdown(timeUntilNextSleep, "Next sleep time in ")
         } else {
-            Log.d("ForegroundService", "No upcoming sleep time found.")
-            stopSelf() // Ensure to stop the service if no sleep times are available
+            stopSelf()
         }
     }
 
@@ -162,7 +161,6 @@ class ForegroundService : Service() {
         val minutes = (millisUntilFinished / (1000 * 60)) % 60
         val seconds = (millisUntilFinished / 1000) % 60
 
-        // Format the time as HH:MM:SS
         val timeRemaining = String.format("%02d:%02d:%02d", hours, minutes, seconds)
 
         val notification = createNotification("$text $timeRemaining")

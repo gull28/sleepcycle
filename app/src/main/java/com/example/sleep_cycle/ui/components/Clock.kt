@@ -79,14 +79,13 @@ fun Clock(vertices: List<Vertice>?) {
                 (clockHandLocation >= vertice.start && clockHandLocation <= 360) ||
                         (clockHandLocation >= 0 && clockHandLocation <= vertice.end)
             } else {
-                // Regular case where start is before or equal to end
                 clockHandLocation >= vertice.start && clockHandLocation <= vertice.end
             }
 
 
 
             val sliceColor = if (isHandWithinVertice) {
-                AppColors.Primary.copy(alpha = pulseAlpha) // Pulsate color
+                AppColors.Primary.copy(alpha = pulseAlpha)
             } else {
                 AppColors.Primary
             }

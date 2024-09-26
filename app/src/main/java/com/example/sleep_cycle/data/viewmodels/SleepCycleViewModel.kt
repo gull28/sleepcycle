@@ -139,7 +139,6 @@ class SleepCycleViewModel @Inject constructor(
 
         resetNotifAction()
         if(result){
-            Log.d("SleepCycleViewModel", "Sleep cycle deleted successfully.")
             return
         }
         _errorMessage.value = "Error: Unable to delete sleep cycle."
@@ -152,7 +151,7 @@ class SleepCycleViewModel @Inject constructor(
 
     fun getAllSleepCycles(): List<SleepCycle>? {
         viewModelScope.launch {
-            val cycles = sleepCycleRepository.getAllSleepCycles()  // Assuming this returns List<SleepCycle>
+            val cycles = sleepCycleRepository.getAllSleepCycles()
             _sleepCycles.value = cycles
 
             val activeCycle = cycles.find { it.isActive == 1 }
@@ -173,8 +172,6 @@ class SleepCycleViewModel @Inject constructor(
         }
 
         return _sleepCycles.value;
-
-        // find the active cycle
     }
 
     fun toggleActive(id: Long) {
@@ -184,7 +181,7 @@ class SleepCycleViewModel @Inject constructor(
         val activeCycle = sleepCycleRepository.getSleepCycleById(id)
         // set it as active in the viewmodel
         setActiveSleepCycle(activeCycle)
-        // profit
+        // Profit
         if (result) {
             Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
         } else {
@@ -195,7 +192,6 @@ class SleepCycleViewModel @Inject constructor(
 
 
     private fun loadSleepTimes() {
-        // Load sleep times from repository and update the LiveData
         viewModelScope.launch {
             _sleepTimes.value =
                 sleepCycle.value?.id?.let { sleepCycleRepository.getSleepCycleById(it)?.sleepTimes } as MutableList<SleepTime>?

@@ -53,7 +53,7 @@ import com.example.sleep_cycle.ui.theme.AppColors
 @Composable
 fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, preferences: PreferenceViewModel) {
     viewModel.getAllSleepCycles()
-    val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList()) // Observe list of cycles
+    val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList()) 
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
     val mode = preferences.modeFlow.collectAsState(initial = true)
 
@@ -138,7 +138,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp) // Space between text and symbol
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
                             letterSpacing = 1.1.sp,
@@ -150,7 +150,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                             text = "+",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = Color.White // Change color as needed
+                            color = Color.White
                         )
                     }
                 }
@@ -176,13 +176,13 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp) // Space between text and symbol
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
                             text = "+ ",
                             fontWeight = FontWeight.W300,
                             fontSize = 24.sp,
-                            color = AppColors.Slate // Change color as needed
+                            color = AppColors.Slate
                         )
                         Text(
                             letterSpacing = 1.1.sp,
