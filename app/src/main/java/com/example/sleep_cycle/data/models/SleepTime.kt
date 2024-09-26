@@ -23,7 +23,7 @@ data class SleepTime(
 ) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateEndTime(): String {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val start = LocalTime.parse(startTime, formatter)
         val end = start.plusMinutes(duration.toLong())
         return end.format(formatter)
@@ -57,10 +57,7 @@ data class SleepTime(
 
         if (startCal.after(endTime)) {
             startCal.add(Calendar.DAY_OF_YEAR, -1)
-            Log.d("adjustedStartTime", startCal.time.toString())
         }
-
-        Log.d("endTime", endTime.time.toString())
 
         return endTime
     }
@@ -69,7 +66,7 @@ data class SleepTime(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun isTimeInTimeFrame(timeStart: String, timeEnd: String): Boolean {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val start = LocalTime.parse(startTime, formatter)
         val end = start.plusMinutes(duration.toLong())
 
@@ -84,6 +81,4 @@ data class SleepTime(
                     (endTimeToCheck.isBefore(end))
         }
     }
-
-
 }

@@ -1,8 +1,5 @@
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import java.util.Calendar
-import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TimeRange(private val startTimeStr: String, private val endTimeStr: String) {
@@ -10,54 +7,50 @@ class TimeRange(private val startTimeStr: String, private val endTimeStr: String
     private val startTime = parseTime(startTimeStr)
     private val endTime = parseTime(endTimeStr)
 
-    // hack, will fix
-    private fun parseTime(timeStr: String): Pair<Int, Int> {
-        val (hours, minutes) = timeStr.split(":").map { it.toInt() }
-        return Pair(hours, minutes)
+    private fun parseTime(timeStr: String): Triple<Int, Int, Int> {
+        val (hours, minutes, seconds) = timeStr.split(":").map { it.toInt() }
+        return Triple(hours, minutes, seconds)
     }
 
-    private fun toMinutes(time: Pair<Int, Int>): Int {
-        return time.first * 60 + time.second
+    private fun toSeconds(time: Triple<Int, Int, Int>): Int {
+        return time.first * 3600 + time.second * 60 + time.third
     }
 
     fun isWithinRange(timeStr: String): Boolean {
         val time = parseTime(timeStr)
-        val currentTimeInMinutes = toMinutes(time)
-        val startTimeInMinutes = toMinutes(startTime)
-        val endTimeInMinutes = toMinutes(endTime)
+        val currentTimeInSeconds = toSeconds(time)
+        val startTimeInSeconds = toSeconds(startTime)
+        val endTimeInSeconds = toSeconds(endTime)
 
-        return if (endTimeInMinutes < startTimeInMinutes) {
-            currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes
+        return if (endTimeInSeconds < startTimeInSeconds) {
+            currentTimeInSeconds >= startTimeInSeconds || currentTimeInSeconds < endTimeInSeconds
         } else {
-            currentTimeInMinutes in (startTimeInMinutes until endTimeInMinutes)
+            currentTimeInSeconds in (startTimeInSeconds until endTimeInSeconds)
         }
     }
 
     fun millisUntilEnd(currentTimeStr: String): Long {
         val currentTime = parseTime(currentTimeStr)
 
-        val currentTimeInMinutes = toMinutes(currentTime)
-        val startTimeInMinutes = toMinutes(startTime)
-        val endTimeInMinutes = toMinutes(endTime)
+        val currentTimeInSeconds = toSeconds(currentTime)
+        val startTimeInSeconds = toSeconds(startTime)
+        val endTimeInSeconds = toSeconds(endTime)
 
-        val durationInMinutes: Int
+        val durationInSeconds: Int
 
-        if (endTimeInMinutes < startTimeInMinutes) {
-
-            if (currentTimeInMinutes >= startTimeInMinutes) {
-                durationInMinutes = (1440 - currentTimeInMinutes) + endTimeInMinutes
+        if (endTimeInSeconds < startTimeInSeconds) {
+            durationInSeconds = if (currentTimeInSeconds >= startTimeInSeconds) {
+                (86400 - currentTimeInSeconds) + endTimeInSeconds // 86400 seconds in a day
             } else {
-                durationInMinutes = endTimeInMinutes - currentTimeInMinutes
+                endTimeInSeconds - currentTimeInSeconds
             }
         } else {
-
-            durationInMinutes = endTimeInMinutes - currentTimeInMinutes
+            durationInSeconds = endTimeInSeconds - currentTimeInSeconds
         }
 
-        val durationInMillis = durationInMinutes * 60 * 1000L
+        val durationInMillis = durationInSeconds * 1000L
         return durationInMillis
     }
-
 
     override fun toString(): String {
         return "TimeRange(startTime=$startTimeStr, endTime=$endTimeStr)"

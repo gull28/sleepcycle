@@ -22,7 +22,7 @@ fun TimeInputDialog(
     val context = LocalContext.current
 
     var name by remember { mutableStateOf(TextFieldValue(sleepTime?.name ?: "")) }
-    var startTime by remember { mutableStateOf(sleepTime?.startTime ?: "00:00") }
+    var startTime by remember { mutableStateOf(sleepTime?.startTime ?: "00:00:00") }
     var duration by remember { mutableStateOf(sleepTime?.duration ?: 0) }
 
     fun openStartTimePicker() {
@@ -31,7 +31,8 @@ fun TimeInputDialog(
         val initialMinute = startTime.split(":")[1].toIntOrNull() ?: calendar.get(Calendar.MINUTE)
 
         TimePickerDialog(context, { _, hourOfDay, minute ->
-            startTime = String.format("%02d:%02d", hourOfDay, minute)
+            // Append :00 for seconds
+            startTime = String.format("%02d:%02d:00", hourOfDay, minute)
         }, initialHour, initialMinute, true).show()
     }
 
@@ -40,6 +41,7 @@ fun TimeInputDialog(
         val initialMinute = duration % 60
 
         TimePickerDialog(context, { _, hourOfDay, minute ->
+            // Convert duration to minutes and seconds (0 seconds by default)
             duration = hourOfDay * 60 + minute
         }, initialHour, initialMinute, true).show()
     }
@@ -86,7 +88,7 @@ fun TimeInputDialog(
                     ),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    Text("Start Time: $startTime", style = MaterialTheme.typography.bodyLarge)
+                    Text("Start Time: ${startTime.substring(0, 5)}", style = MaterialTheme.typography.bodyLarge)
                 }
 
                 Button(
@@ -115,7 +117,8 @@ fun TimeInputDialog(
                             id = sleepTime?.id,
                             scheduleId = sleepTime?.scheduleId,
                             name = name.text,
-                            startTime = startTime,
+                            // Save startTime with seconds as "HH:mm:ss"
+                            startTime = "$startTime",
                             duration = duration
                         )
                         onSave(sleepTime)
@@ -146,6 +149,4 @@ fun TimeInputDialog(
         },
         shape = RoundedCornerShape(16.dp),
     )
-
 }
-

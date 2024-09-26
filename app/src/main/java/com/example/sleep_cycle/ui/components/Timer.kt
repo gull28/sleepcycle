@@ -2,6 +2,7 @@ package com.example.sleep_cycle.ui.components
 
 import TimeRange
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -28,7 +29,6 @@ interface TimerData {
     var duration: Long; // ms
     var displayRingDown: Boolean;
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -140,11 +140,13 @@ fun CircularProgressBar(progressPercent: Float) {
 @RequiresApi(Build.VERSION_CODES.O)
 fun getTimer(cycle: SleepCycle): TimerData {
     val currentTime = LocalTime.now()
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
     val activeSleepTime = cycle.sleepTimes.find { sleepTime ->
         sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
     }
+
+    Log.d("activsSleepTime", activeSleepTime.toString())
 
     activeSleepTime?.let {
         return object : TimerData {
@@ -159,12 +161,13 @@ fun getTimer(cycle: SleepCycle): TimerData {
     }
 
     val nextSleepTime = cycle.getNextSleepTime()
-    nextSleepTime?.let {
+
+    nextSleepTime?.let { it ->
         return object : TimerData {
             override var text = "Upcoming ${it.name}"
             override var timer = Time.getTimeUntil(Time.stringToDateObj(it.startTime))
             override var duration = 0L;
-            override  var displayRingDown = false;
+            override var displayRingDown = false;
         }
     }
 
