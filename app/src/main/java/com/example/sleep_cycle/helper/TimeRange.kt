@@ -10,6 +10,7 @@ class TimeRange(private val startTimeStr: String, private val endTimeStr: String
     private val startTime = parseTime(startTimeStr)
     private val endTime = parseTime(endTimeStr)
 
+    // hack, will fix
     private fun parseTime(timeStr: String): Pair<Int, Int> {
         val (hours, minutes) = timeStr.split(":").map { it.toInt() }
         return Pair(hours, minutes)

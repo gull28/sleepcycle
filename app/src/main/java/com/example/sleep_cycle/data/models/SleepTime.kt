@@ -73,7 +73,6 @@ data class SleepTime(
         val start = LocalTime.parse(startTime, formatter)
         val end = start.plusMinutes(duration.toLong())
 
-
         val startTimeToCheck = LocalTime.parse(timeStart, formatter)
         val endTimeToCheck = LocalTime.parse(timeEnd, formatter)
 

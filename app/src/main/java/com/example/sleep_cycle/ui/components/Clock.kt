@@ -29,7 +29,6 @@ interface Vertices {
 fun Clock(vertices: List<Vertice>?) {
     var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
 
-    // Update time every second
     LaunchedEffect(Unit) {
         while (true) {
             kotlinx.coroutines.delay(1000L)
