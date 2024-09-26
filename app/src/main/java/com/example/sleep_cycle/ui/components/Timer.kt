@@ -21,6 +21,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.example.sleep_cycle.data.model.SleepTime
 
 
 interface TimerData {
@@ -38,8 +39,11 @@ fun Timer(cycle: SleepCycle) {
     val currentTimeText by rememberUpdatedState(timeData.text)
 
     LaunchedEffect(cycle) {
-        timeData = getTimer(cycle)
-        remainingTime = timeData.timer
+        while (true) {
+            timeData = getTimer(cycle)
+            remainingTime = timeData.timer
+            delay(5 * 60 * 1000L)
+        }
     }
 
     LaunchedEffect(remainingTime) {
@@ -52,52 +56,54 @@ fun Timer(cycle: SleepCycle) {
         }
     }
 
-    val progressPercent = if (timeData.timer > 0 && timeData.displayRingDown) {
-        (remainingTime / timeData.duration.toFloat()) * 100
-    } else {
-        100f
-    }
-
-    val totalMillis = remainingTime
-    val hours = (totalMillis / (1000 * 60 * 60)) % 24
-    val minutes = (totalMillis / (1000 * 60)) % 60
-    val seconds = (totalMillis / 1000) % 60
+    val progressPercent = calculateProgress(timeData, remainingTime)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(330.dp)
     ) {
         CircularProgressBar(progressPercent)
+        TimerTextContent(currentTimeText, remainingTime)
+    }
+}
 
-        Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = currentTimeText,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 20.dp),
-                color = AppColors.Slate.copy(alpha = 0.75f),
-                letterSpacing = 1.05.sp
-            )
+@Composable
+fun TimerTextContent(currentTimeText: String, remainingTime: Long) {
+    val (hours, minutes, seconds) = calculateTimeUnits(remainingTime)
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                TimeDisplay(hours)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = ":", fontSize = 42.sp, color = AppColors.Slate)
-                Spacer(modifier = Modifier.width(4.dp))
-                TimeDisplay(minutes)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = ":", fontSize = 42.sp, color = AppColors.Slate)
-                Spacer(modifier = Modifier.width(4.dp))
-                TimeDisplay(seconds)
-            }
-        }
+    Column(
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = currentTimeText,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(bottom = 20.dp),
+            color = AppColors.Slate.copy(alpha = 0.75f),
+            letterSpacing = 1.05.sp
+        )
+
+        TimeDisplayRow(hours, minutes, seconds)
+    }
+}
+
+@Composable
+fun TimeDisplayRow(hours: Long, minutes: Long, seconds: Long) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        TimeDisplay(hours)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = ":", fontSize = 42.sp, color = AppColors.Slate)
+        Spacer(modifier = Modifier.width(4.dp))
+        TimeDisplay(minutes)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = ":", fontSize = 42.sp, color = AppColors.Slate)
+        Spacer(modifier = Modifier.width(4.dp))
+        TimeDisplay(seconds)
     }
 }
 
@@ -105,7 +111,6 @@ fun Timer(cycle: SleepCycle) {
 fun TimeDisplay(value: Long) {
     Text(text = "%02d".format(value), fontSize = 42.sp, color = AppColors.Slate)
 }
-
 
 @Composable
 fun CircularProgressBar(progressPercent: Float) {
@@ -124,7 +129,6 @@ fun CircularProgressBar(progressPercent: Float) {
             trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
         )
 
-
         CircularProgressIndicator(
             progress = { progress },
             modifier = Modifier.size(330.dp),
@@ -135,8 +139,6 @@ fun CircularProgressBar(progressPercent: Float) {
     }
 }
 
-
-
 @RequiresApi(Build.VERSION_CODES.O)
 fun getTimer(cycle: SleepCycle): TimerData {
     val currentTime = LocalTime.now()
@@ -146,35 +148,56 @@ fun getTimer(cycle: SleepCycle): TimerData {
         sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
     }
 
-    Log.d("activsSleepTime", activeSleepTime.toString())
+    return activeSleepTime?.let {
+        createActiveTimerData(it, currentTime)
+    } ?: cycle.getNextSleepTime()?.let {
+        createUpcomingTimerData(it)
+    } ?: createNoTimerData()
+}
 
-    activeSleepTime?.let {
-        return object : TimerData {
-            override var text = "Active ${it.name}"
-            override var timer = TimeRange(
-                it.startTime,
-                it.calculateEndTime()
-            ).millisUntilEnd(currentTime.format(formatter))
-            override var duration = it.duration.toLong() * 60 * 1000;
-            override var displayRingDown = true;
-        }
-    }
-
-    val nextSleepTime = cycle.getNextSleepTime()
-
-    nextSleepTime?.let { it ->
-        return object : TimerData {
-            override var text = "Upcoming ${it.name}"
-            override var timer = Time.getTimeUntil(Time.stringToDateObj(it.startTime))
-            override var duration = 0L;
-            override var displayRingDown = false;
-        }
-    }
-
+@RequiresApi(Build.VERSION_CODES.O)
+fun createActiveTimerData(sleepTime: SleepTime, currentTime: LocalTime): TimerData {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     return object : TimerData {
-        override var text = "No upcoming sleep cycle";
-        override var timer = 1000L;
-        override var duration = 0L;
-        override  var displayRingDown = false;
+        override var text = "Active ${sleepTime.name}"
+        override var timer = TimeRange(
+            sleepTime.startTime,
+            sleepTime.calculateEndTime()
+        ).millisUntilEnd(currentTime.format(formatter))
+        override var duration = sleepTime.duration.toLong() * 60 * 1000 // duration in ms
+        override var displayRingDown = true
     }
+}
+
+fun createUpcomingTimerData(sleepTime: SleepTime): TimerData {
+    return object : TimerData {
+        override var text = "Upcoming ${sleepTime.name}"
+        override var timer = Time.getTimeUntil(Time.stringToDateObj(sleepTime.startTime))
+        override var duration = 0L
+        override var displayRingDown = false
+    }
+}
+
+fun createNoTimerData(): TimerData {
+    return object : TimerData {
+        override var text = "No upcoming sleep cycle"
+        override var timer = 1000L
+        override var duration = 0L
+        override var displayRingDown = false
+    }
+}
+
+fun calculateProgress(timeData: TimerData, remainingTime: Long): Float {
+    return if (timeData.displayRingDown && timeData.timer > 0) {
+        (remainingTime / timeData.duration.toFloat()) * 100
+    } else {
+        100f
+    }
+}
+
+fun calculateTimeUnits(totalMillis: Long): Triple<Long, Long, Long> {
+    val hours = (totalMillis / (1000 * 60 * 60)) % 24
+    val minutes = (totalMillis / (1000 * 60)) % 60
+    val seconds = (totalMillis / 1000) % 60
+    return Triple(hours, minutes, seconds)
 }

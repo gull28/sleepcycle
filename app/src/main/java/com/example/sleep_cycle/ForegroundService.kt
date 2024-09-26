@@ -11,7 +11,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.CountDownTimer
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -30,6 +32,8 @@ class ForegroundService : Service() {
     lateinit var sleepCycleRepository: SleepCycleRepository
 
     private var countdownTimer: CountDownTimer? = null
+    private val syncHandler = Handler(Looper.getMainLooper())
+    private lateinit var syncRunnable: Runnable
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
@@ -38,6 +42,13 @@ class ForegroundService : Service() {
         registerReceiver(sleepCycleReceiver, IntentFilter("UPDATE_SLEEP_CYCLE"),
             RECEIVER_EXPORTED
        )
+
+        syncRunnable = Runnable {
+            fetchAndUpdateSleepTimes()
+            syncHandler.postDelayed(syncRunnable, 5 * 60 * 1000) // 5 minutes
+        }
+
+        syncHandler.post(syncRunnable)
     }
 
     private val sleepCycleReceiver = object : BroadcastReceiver() {
