@@ -17,6 +17,10 @@ class PreferenceViewModel @Inject constructor(
 
     val notificationPermissionFlow: Flow<Boolean> = preference.notificationPermissionFlow
 
+    val batteryInfoShownFlow: Flow<Boolean> = preference.batteryInfoShownFlow
+
+    val isDatabaseSeededFlow: Flow<Boolean> = preference.isDatabaseSeededFlow
+
     fun saveMode(value: Boolean) {
         viewModelScope.launch {
             preference.saveMode(value)
@@ -28,4 +32,18 @@ class PreferenceViewModel @Inject constructor(
             preference.saveNotificationPermission(isGranted)
         }
     }
+
+    fun saveBatteryInfoShownFlow(shown: Boolean) {
+        viewModelScope.launch {
+            preference.saveBatteryInfoShownFlow(shown)
+        }
+    }
+
+    fun setDatabaseSeeded() {
+        viewModelScope.launch {
+            preference.setDatabaseSeeded()
+        }
+    }
+
+
 }

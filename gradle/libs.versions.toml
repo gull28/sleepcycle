@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.2"
-coreKtxVersion = "1.10.1"
+coreKtxVersion = "1.13.1"
 datastorePreferences = "1.1.1"
 hiltAndroidCompiler = "2.46.1"
 hiltNavigationCompose = "1.2.0"
@@ -20,9 +20,14 @@ navigationRuntimeKtx = "2.7.7"
 navigationUiKtx = "2.7.7"
 navigationFragmentKtx = "2.7.7"
 navigationCompose = "2.7.7"
+roomCompiler = "2.6.1"
+roomCompilerVersion = "2.5.0"
+roomKtx = "2.6.1"
+roomRuntime = "2.6.1"
 runtimeLivedata = "1.6.8"
 workRuntime = "2.9.1"
 datastorePreferencesCoreJvm = "1.1.1"
+roomCommon = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +37,9 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-material3 = { module = "androidx.compose.material3:material3" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
@@ -51,8 +59,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

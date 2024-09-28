@@ -1,4 +1,5 @@
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.ui.theme.AppColors
 import java.util.*
 
@@ -113,15 +114,16 @@ fun TimeInputDialog(
             Button(
                 onClick = {
                     if (name.text.isNotBlank() && duration > 0 && duration < 1440) {
-                        val sleepTime = SleepTime(
+                        val sleep = SleepTime(
                             id = sleepTime?.id,
                             scheduleId = sleepTime?.scheduleId,
                             name = name.text,
-                            // Save startTime with seconds as "HH:mm:ss"
                             startTime = startTime,
                             duration = duration
                         )
-                        onSave(sleepTime)
+
+                        Log.d("123849375", sleep.toString())
+                        onSave(sleep)
                         onDismiss()
                     } else {
                         Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()

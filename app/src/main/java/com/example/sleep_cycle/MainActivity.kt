@@ -5,8 +5,12 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,14 +41,17 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sleep_cycle.data.db.Seed
+import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
 import com.example.sleep_cycle.ui.theme.AppColors
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var sleepCycleRepository: SleepCycleRepository
 
     private val preferenceViewModel: PreferenceViewModel by viewModels()
 
@@ -53,6 +60,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = (AppColors.Background.toArgb())
+        }
+
+        lifecycleScope.launch {
+            preferenceViewModel.isDatabaseSeededFlow.collect { isSeeded ->
+                if (!isSeeded) {
+                    Seed(sleepCycleRepository).seedDatabase()
+                    preferenceViewModel.setDatabaseSeeded()
+                }
+            }
         }
 
         setContent {
@@ -72,6 +88,7 @@ class MainActivity : ComponentActivity() {
             ContextCompat.startForegroundService(this, intent)
         }
 
+        // Collect the notification permission state
         lifecycleScope.launch {
             preferenceViewModel.notificationPermissionFlow.collect { isGranted ->
                 if (!isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -93,6 +110,7 @@ class MainActivity : ComponentActivity() {
         requestPermissionLauncher.launch(POST_NOTIFICATIONS)
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -101,8 +119,6 @@ class MainActivity : ComponentActivity() {
         // stopService(serviceIntent)
     }
 }
-
-
 
 fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager

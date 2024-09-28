@@ -1,8 +1,10 @@
 // SleepCycleModule.kt
 package com.example.sleep_cycle.data.modules
 
-import android.app.Application
 import android.content.Context
+import com.example.sleep_cycle.data.AppDatabase
+import com.example.sleep_cycle.data.dao.SleepCycleDao
+import com.example.sleep_cycle.data.dao.SleepTimeDao
 import com.example.sleep_cycle.data.repository.Preference
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
@@ -16,12 +18,29 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object SleepCycleModule {
+
     @Provides
     @Singleton
-    fun provideSleepCycleRepository(
-        @ApplicationContext context: Context
-    ): SleepCycleRepository {
-        return SleepCycleRepository(context)
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return AppDatabase.getDatabase(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSleepCycleDao(database: AppDatabase): SleepCycleDao {
+        return database.sleepCycleDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSleepTimeDao(database: AppDatabase): SleepTimeDao {
+        return database.sleepTimeDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSleepCycleRepository(sleepCycleDao: SleepCycleDao): SleepCycleRepository {
+        return SleepCycleRepository(sleepCycleDao)
     }
 
     @Provides
@@ -32,9 +51,7 @@ object SleepCycleModule {
 
     @Provides
     @Singleton
-    fun provideSleepTimeRepository(
-        @ApplicationContext context: Context
-    ): SleepTimeRepository {
-        return SleepTimeRepository(context)
+    fun provideSleepTimeRepository(sleepTimeDao: SleepTimeDao): SleepTimeRepository {
+        return SleepTimeRepository(sleepTimeDao)
     }
 }

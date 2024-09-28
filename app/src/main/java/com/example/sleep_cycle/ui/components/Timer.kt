@@ -2,7 +2,6 @@ package com.example.sleep_cycle.ui.components
 
 import TimeRange
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -17,11 +16,9 @@ import kotlinx.coroutines.delay
 import com.example.sleep_cycle.ui.theme.AppColors
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import androidx.compose.foundation.Canvas
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.ui.graphics.drawscope.Stroke
-import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.models.SleepTime
 
 
 interface TimerData {

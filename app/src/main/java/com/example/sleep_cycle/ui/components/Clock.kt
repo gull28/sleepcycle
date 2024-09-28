@@ -1,6 +1,5 @@
 package com.example.sleep_cycle.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
-import com.example.sleep_cycle.data.model.Vertice
+import com.example.sleep_cycle.data.models.Vertice
 import java.util.Calendar
 import kotlin.math.PI
 import kotlin.math.cos

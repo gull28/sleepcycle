@@ -1,10 +1,12 @@
-package com.example.sleep_cycle.data.model
+package com.example.sleep_cycle.data.models
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import com.example.sleep_cycle.helper.Time
-import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -14,12 +16,21 @@ interface Vertice {
     var end: Int;
 }
 
+@Entity(
+    tableName = "sleep_times",
+    foreignKeys = [ForeignKey(
+        entity = SleepCycle::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("scheduleId"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class SleepTime(
-    val id: Long? = null,
-    var name: String = "",
-    val scheduleId: Long? = null,
-    var startTime: String = "",
-    val duration: Int = 20,
+    @PrimaryKey(autoGenerate = true) val id: Long? = null,
+    @ColumnInfo(name = "name") var name: String = "",
+    @ColumnInfo(name = "scheduleId", index = true) var scheduleId: Long? = null, // Foreign key
+    @ColumnInfo(name = "start_time") var startTime: String = "",
+    @ColumnInfo(name = "duration") val duration: Int = 20
 ) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateEndTime(): String {
@@ -31,7 +42,7 @@ data class SleepTime(
 
     fun getVertice(): Vertice {
         val start = Time.stringToDateObj(startTime)
-        val end = start.clone() as Calendar;
+        val end = start.clone() as Calendar
         end.add(Calendar.MINUTE, duration)
 
         val startHour = start.get(Calendar.HOUR_OF_DAY)
@@ -61,8 +72,6 @@ data class SleepTime(
 
         return endTime
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun isTimeInTimeFrame(timeStart: String, timeEnd: String): Boolean {

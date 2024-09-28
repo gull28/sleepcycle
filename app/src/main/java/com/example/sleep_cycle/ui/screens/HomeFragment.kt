@@ -4,36 +4,13 @@ import TimeRange
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,12 +25,11 @@ import com.example.sleep_cycle.ui.components.SleepCycleList
 import com.example.sleep_cycle.ui.components.Timer
 import com.example.sleep_cycle.ui.theme.AppColors
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, preferences: PreferenceViewModel) {
     viewModel.getAllSleepCycles()
-    val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList()) 
+    val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList())
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
     val mode = preferences.modeFlow.collectAsState(initial = true)
 
@@ -62,6 +38,10 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
     LaunchedEffect(sleepCycles) {
         isLoading = false
     }
+
+    // Track whether to show the overlay
+    val hasSeenOverlay by preferences.batteryInfoShownFlow.collectAsState(initial = false)
+    val showOverlay = !hasSeenOverlay
 
     Box(
         modifier = Modifier
@@ -106,28 +86,27 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                 if(mode.value){
                     Timer(cycle = activeSleepCycle!!)
                     Spacer(modifier = Modifier.height(16.dp))
-                }else{
+                } else {
                     Clock(vertices = activeSleepCycle!!.getSleepTimeVertices())
                 }
-            }else if (activeSleepCycle == null){
+            } else if (activeSleepCycle == null){
                 Text(
                     text = "No active sleep cycle found.",
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
                     modifier = Modifier.padding(8.dp)
                 )
-            }
-            else {
+            } else {
                 Text(
                     text = "No sleep times found.",
                     color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-                    modifier = Modifier.padding(8.dp)
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
+                    modifier = Modifier.padding(vertical = 24.dp).padding(bottom = 48.dp)
                 )
 
                 Button(
                     onClick = { activeSleepCycle?.let { viewModel.setSleepCycle(sleepCycle = it) }
-                        navController.navigate("detailsScreen")
+                        navController.navigate("sleepCycleScreen")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.ClockFace),
                     contentPadding = PaddingValues(vertical = 18.dp),
@@ -145,12 +124,6 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                             fontWeight = FontWeight(400),
                             fontSize = 16.sp,
                             text = "Add sleep times"
-                        )
-                        Text(
-                            text = "+",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = Color.White
                         )
                     }
                 }
@@ -173,7 +146,6 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                         .weight(1f)
                         .padding(bottom = 10.dp)
                 ) {
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -188,18 +160,72 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                             letterSpacing = 1.1.sp,
                             fontWeight = FontWeight(385),
                             fontSize = 16.sp,
-                            text = "Create New Sleep Cycle ")
-
+                            text = "Create New Sleep Cycle"
+                        )
                     }
                 }
             }
-
 
             SleepCycleList(
                 sleepCycles = sleepCycles,
                 navController = navController,
                 sleepCycleViewModel = viewModel,
             )
+        }
+
+        if (showOverlay) {
+            OverlayMessage(
+                onDismiss = {
+                    preferences.saveBatteryInfoShownFlow(true)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun OverlayMessage(onDismiss: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.Background.copy(alpha = 0.33f)) // Slightly grayed out background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+                .background(
+                    AppColors.Background.copy(alpha = 0.95f), // Slightly transparent for the overlay
+                    RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                )
+                .fillMaxHeight(0.30f), // Adjust to the desired height
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Important Information",
+                style = MaterialTheme.typography.headlineMedium,
+                color = AppColors.Slate,
+                letterSpacing = 1.05.sp,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "For the best experience, please ensure that battery optimizations are disabled for this app. You can do this in your device settings.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppColors.TextSecondary,
+                fontSize = 18.sp,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                modifier = Modifier.fillMaxWidth(0.75f).padding(bottom = 20.dp),
+                shape = RoundedCornerShape(15.dp),
+            ) {
+                Text(text = "Got it!")
+            }
         }
     }
 }

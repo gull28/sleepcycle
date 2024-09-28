@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sleep_cycle.data.models.SleepCycle
+import com.example.sleep_cycle.data.models.SleepCycleWithTimes
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.theme.AppColors
@@ -37,27 +38,30 @@ fun SleepCycleList(
 ) {
     val activeSleepCycle by sleepCycleViewModel.activeSleepCycle.observeAsState()
 
+
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .wrapContentHeight()
             .padding(vertical = 24.dp)
     ) {
-        items(sleepCycles) { sleepCycle ->
+        items(sleepCycles) { cycle ->
             SleepCycleItem(
-                sleepCycle = sleepCycle,
-                isActive = activeSleepCycle?.id == sleepCycle.id,
+                sleepCycle = cycle,
+                totalSleepTime = cycle.totalSleepTime(),
+                isActive = activeSleepCycle?.id == cycle.id,
                 onClick = {
-                    sleepCycleViewModel.setSleepCycle(sleepCycle)
+                    sleepCycleViewModel.setSleepCycle(cycle)
                     navController.navigate("sleepCycleScreen")
                 },
-                onToggleActive = { cycle ->
+                onToggleActive = { value ->
                     val isCurrentlyActive = activeSleepCycle?.id == cycle.id
 
                     if (isCurrentlyActive) {
-                        sleepCycleViewModel.toggleActive(cycle.id!!)
+                        sleepCycleViewModel.toggleActive(cycle.id, 0)
                         sleepCycleViewModel.setActiveSleepCycle(null)
                     } else {
-                        sleepCycleViewModel.toggleActive(cycle.id!!)
+                        sleepCycleViewModel.toggleActive(cycle.id, if (value) 1 else 0)
                         sleepCycleViewModel.setActiveSleepCycle(cycle)
                     }
                 }
@@ -66,14 +70,13 @@ fun SleepCycleList(
     }
 }
 
-
-
 @Composable
 fun SleepCycleItem(
     sleepCycle: SleepCycle,
+    totalSleepTime: Int,
     isActive: Boolean,
     onClick: () -> Unit,
-    onToggleActive: (SleepCycle) -> Unit
+    onToggleActive: (Boolean) -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -88,34 +91,27 @@ fun SleepCycleItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = sleepCycle.name,
                     color = AppColors.TextPrimary,
                     style = MaterialTheme.typography.bodyMedium
                 )
-
                 Text(
-                    text = "Sleep time ${Time.minutesToHHMM(sleepCycle.totalSleepTime())}",
+                    text = "Total sleep time: ${Time.minutesToHHMM(totalSleepTime)}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp),
                     color = AppColors.TextSecondary
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
             Switch(
                 checked = isActive,
-                onCheckedChange = {
-                    sleepCycle.id?.let {
-                        onToggleActive(sleepCycle)
-                    }
-                },
-                colors = SwitchDefaults.colors(checkedThumbColor = AppColors.Primary, checkedTrackColor = AppColors.Slate)
-
+                onCheckedChange = { onToggleActive(!isActive) },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = AppColors.Primary,
+                    checkedTrackColor = AppColors.Slate
+                )
             )
         }
     }

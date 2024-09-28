@@ -1,7 +1,6 @@
 package com.example.sleep_cycle.ui.screens
 
 import TimeInputDialog
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -9,30 +8,23 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.sleep_cycle.data.repository.SleepCycleRepository
-import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.theme.AppColors
 
@@ -49,6 +41,10 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
 
     val showDialog = remember { mutableStateOf(false) }
     val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(sleepCycle?.sleepTimes) {
+        Log.d("sleep change", sleepCycle?.sleepTimes.toString())
+    }
 
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
@@ -69,7 +65,9 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
         ) {
-            Clock(vertices = sleepCycle!!.getSleepTimeVertices())
+            Clock(vertices = sleepTimes.map {
+                it.getVertice()
+            })
 
             Text(
                 text = sleepCycle?.name ?: "Unknown",
@@ -88,19 +86,19 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 onRemoveClicked = { _, sleepTime ->
                     sleepTime.id?.let { viewModel.removeSleepTime(it) }
 
-                    // Refetch and update
                     viewModel.resetNotifAction()
-                    viewModel.getAllSleepCycles()
                 }
             )
         }
+        
+        Text(text = sleepCycle?.id.toString(), color = AppColors.Slate)
 
         Row(
             modifier = Modifier.padding(bottom = 20.dp)
         ) {
             Button(
                 onClick = {
-                    sleepCycle?.id?.let { viewModel.deleteSleepCycle(it) }
+                    sleepCycle?.let { viewModel.deleteSleepCycle(it) }
 
                     navController.navigateUp()
                 },
@@ -188,27 +186,30 @@ private fun handleSaveSleepTime(
     navController: NavController
 ) {
     // Check if editing
-    val repository = SleepTimeRepository(context)
-
     if (selectedSleepTime != null) {
         // Edit route
-        val res = repository.updateSleepTime(sleepTime)
+        val res = viewModel.updateSleepTime(sleepTime)
 
         viewModel.getAllSleepCycles()
     } else {
         // Add route
-        val overlappingTime = viewModel.sleepTimes.value?.find {
+        val filteredSleepTimes = viewModel.sleepTimes.value?.filter {
+            it.id != sleepTime.id;
+        }
+
+        val overlappingTime = filteredSleepTimes?.find {
             it.isTimeInTimeFrame(sleepTime.startTime, sleepTime.calculateEndTime())
         }
-        val sameStartTime = viewModel.sleepTimes.value?.find { it.startTime == sleepTime.startTime }
+        val sameStartTime = filteredSleepTimes?.find { it.startTime == sleepTime.startTime }
 
         if (overlappingTime != null) {
             Toast.makeText(context, "This time overlaps with an existing SleepTime.", Toast.LENGTH_SHORT).show()
         } else if (sameStartTime == null) {
 
             val scheduleId = viewModel.sleepCycle.value?.id
+
             if (scheduleId != null) {
-                repository.addSleepTime(sleepTime, scheduleId)
+                viewModel.addSleepTime(sleepTime, scheduleId)
 
                 viewModel.getAllSleepCycles()
             }

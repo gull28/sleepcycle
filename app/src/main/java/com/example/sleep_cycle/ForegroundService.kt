@@ -1,7 +1,6 @@
 package com.example.sleep_cycle
 
 import TimeRange
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -18,13 +17,17 @@ import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.helper.Time
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -38,6 +41,7 @@ class ForegroundService : Service() {
     private var countdownTimer: CountDownTimer? = null
     private val syncHandler = Handler(Looper.getMainLooper())
     private lateinit var syncRunnable: Runnable
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
@@ -77,33 +81,41 @@ class ForegroundService : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchAndUpdateSleepTimes() {
         countdownTimer?.cancel()
+        countdownTimer = null
 
-        val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle()
-        val currentTime = LocalTime.now()
-        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        serviceScope.launch(Dispatchers.IO) {
+            val activeSleepCycle = sleepCycleRepository.getActiveSleepCycle()
+            val currentTime = LocalTime.now()
+            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-        val activeSleepTime = activeSleepCycle?.sleepTimes?.find { sleepTime ->
-            sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
-        }
+            val activeSleepTime = activeSleepCycle?.sleepTimes?.find { sleepTime ->
+                sleepTime.isTimeInTimeFrame(currentTime.format(formatter), currentTime.format(formatter))
+            }
 
-        if (activeSleepTime != null) {
-            val timeUntilEnd = TimeRange(activeSleepTime.startTime, activeSleepTime.calculateEndTime()).millisUntilEnd(currentTime.format(formatter))
-            startCountdown(timeUntilEnd, "Sleep time ends in ")
-            return
-        }
+            val timeUntilEnd = activeSleepTime?.let {
+                TimeRange(it.startTime, it.calculateEndTime()).millisUntilEnd(currentTime.format(formatter))
+            }
 
-        val nextSleepTime = activeSleepCycle?.getNextSleepTime()
+            withContext(Dispatchers.Main) {
+                if (timeUntilEnd != null) {
+                    startCountdown(timeUntilEnd, "Sleep time ends in ")
+                } else {
+                    val nextSleepTime = activeSleepCycle?.getNextSleepTime()
+                    val timeUntilNextSleep = nextSleepTime?.let { calculateTimeUntilNextSleep(it) }
 
-        if (nextSleepTime != null) {
-            val timeUntilNextSleep = calculateTimeUntilNextSleep(nextSleepTime)
-            startCountdown(timeUntilNextSleep, "Next sleep time in ")
-        } else {
-            stopSelf()
+                    if (timeUntilNextSleep != null) {
+                        startCountdown(timeUntilNextSleep, "Next sleep time in ")
+                    } else {
+                        stopSelf()
+                    }
+                }
+            }
         }
     }
 
 
     private fun startCountdown(timeUntil: Long, text: String) {
+        countdownTimer?.cancel()
         countdownTimer = object : CountDownTimer(timeUntil, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 updateNotification(millisUntilFinished, text)

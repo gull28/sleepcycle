@@ -50,7 +50,13 @@ android {
 dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation(libs.androidx.room.common)
+
     kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
 
     implementation(libs.androidx.core.ktx.v1101)
     implementation(libs.androidx.work.runtime)
@@ -59,10 +65,13 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
 
-
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+
+    // Compose Compiler dependency
+    implementation("androidx.compose.compiler:compiler:1.5.0") // Update this version if needed
+
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -70,7 +79,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

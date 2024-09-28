@@ -15,6 +15,8 @@ class Preference @Inject constructor(@ApplicationContext private val context: Co
     companion object {
         val MODE_KEY = booleanPreferencesKey("mode")
         val NOTIFICATION_PERMISSION_KEY = booleanPreferencesKey("notification_permission")
+        val BATTERY_INFO_SHOWN_KEY = booleanPreferencesKey("battery_info_shown")
+        val DATABASE_SEEDED_KEY = booleanPreferencesKey("database_seeded")
     }
 
     suspend fun saveMode(isClockMode: Boolean) {
@@ -27,13 +29,34 @@ class Preference @Inject constructor(@ApplicationContext private val context: Co
         preferences[MODE_KEY] ?: true
     }
 
+
+    val batteryInfoShownFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[BATTERY_INFO_SHOWN_KEY] ?: false
+    }
+
     suspend fun saveNotificationPermission(isGranted: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[NOTIFICATION_PERMISSION_KEY] = isGranted
         }
     }
 
+    suspend fun saveBatteryInfoShownFlow(shown: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[BATTERY_INFO_SHOWN_KEY] = shown
+        }
+    }
+
     val notificationPermissionFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[NOTIFICATION_PERMISSION_KEY] ?: false
+    }
+
+    suspend fun setDatabaseSeeded() {
+        context.dataStore.edit { preferences ->
+            preferences[DATABASE_SEEDED_KEY] = true
+        }
+    }
+
+    val isDatabaseSeededFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[DATABASE_SEEDED_KEY] ?: false
     }
 }

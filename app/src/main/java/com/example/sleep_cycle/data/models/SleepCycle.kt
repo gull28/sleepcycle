@@ -1,19 +1,24 @@
 package com.example.sleep_cycle.data.models
 
-import android.util.Log
-import com.example.sleep_cycle.data.model.SleepTime
-import com.example.sleep_cycle.data.model.Vertice
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.Ignore
+
 import com.example.sleep_cycle.helper.Time
-import com.example.sleep_cycle.ui.components.Vertices
 import java.util.Calendar
 
+@Entity(tableName = "sleep_cycles")
 data class SleepCycle(
-    val id: Long? = null,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,  // Primary key for Room
+
     val name: String,
-    val sleepTimes: List<SleepTime> = emptyList(),
-    val isActive: Int,
-){
-    public fun areTimesValid () : Boolean {
+    val isActive: Int = 0
+) {
+    @Ignore
+    var sleepTimes: List<SleepTime> = emptyList()
+
+    fun areTimesValid(): Boolean {
         return true
     }
 
@@ -33,9 +38,7 @@ data class SleepCycle(
         return futureSleepTimes.minByOrNull { it.second }?.first
     }
 
-
-
-    public fun getSleepTimeVertices(): List<Vertice> {
+    fun getSleepTimeVertices(): List<Vertice> {
         val verticeList = mutableListOf<Vertice>()
 
         sleepTimes.forEach { sleepTime ->
@@ -45,10 +48,9 @@ data class SleepCycle(
         return verticeList
     }
 
-    // Returns total sleeptime in minutes (!!)
-    public fun totalSleepTime() : Int {
-        var totalTime: Int = 0;
-        sleepTimes.map { sleepTime ->
+    fun totalSleepTime(): Int {
+        var totalTime = 0
+        sleepTimes.forEach { sleepTime ->
             totalTime += sleepTime.duration
         }
 

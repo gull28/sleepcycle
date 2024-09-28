@@ -12,14 +12,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sleep_cycle.ForegroundService
 import com.example.sleep_cycle.data.models.SleepCycle
-import com.example.sleep_cycle.data.model.SleepTime
+import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
-import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.content.Context
+import com.example.sleep_cycle.data.repository.SleepTimeRepository
 
 @HiltViewModel
 class SleepCycleViewModel @Inject constructor(
@@ -27,7 +27,7 @@ class SleepCycleViewModel @Inject constructor(
     private val sleepTimeRepository: SleepTimeRepository,
     @ApplicationContext private val appContext: Context,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
@@ -85,17 +85,32 @@ class SleepCycleViewModel @Inject constructor(
         _errorMessage.value = null
     }
 
-    fun addSleepTime(sleepTime: SleepTime) {
-        _sleepTimes.value?.let {
-            it.add(sleepTime)
-            _sleepTimes.value = it
+    fun addSleepTime(sleepTime: SleepTime, scheduleId: Long) {
+
+        viewModelScope.launch{
+            sleepTime.scheduleId = scheduleId
+            sleepTimeRepository.addSleepTime(sleepTime)
+
+            _sleepTimes.value?.let {
+                it.add(sleepTime)
+                _sleepTimes.value = it
+            }
+        }
+    }
+
+    fun addSleepCycle(sleepCycle: SleepCycle) {
+        viewModelScope.launch {
+            sleepCycleRepository.addSleepCycleWithTimes(sleepCycle)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateSleepTime(position: Int, updatedSleepTime: SleepTime) {
+    fun updateSleepTime(updatedSleepTime: SleepTime) {
+        val filteredSleepTimes = _sleepTimes.value?.filter {
+            it.id != updatedSleepTime.id
+        }
         _sleepTimes.value?.let { sleepTimes ->
-            val overlappingTimeFrame = sleepTimes.find {
+            val overlappingTimeFrame = filteredSleepTimes?.find {
                 it.isTimeInTimeFrame(updatedSleepTime.startTime, updatedSleepTime.calculateEndTime())
             }
 
@@ -105,9 +120,16 @@ class SleepCycleViewModel @Inject constructor(
                 return
             }
 
-            if (position in sleepTimes.indices) {
-                sleepTimes[position] = updatedSleepTime
-                _sleepTimes.value = sleepTimes
+            val requiredSleepTime = sleepTimes.find {
+                it.id == updatedSleepTime.id
+            }
+
+            if (requiredSleepTime != null) {
+                viewModelScope.launch {
+                    val result = sleepTimeRepository.updateSleepTime(updatedSleepTime)
+
+                    getAllSleepCycles()
+                }
             } else {
                 _errorMessage.value = "Error: Invalid position specified."
             }
@@ -115,33 +137,34 @@ class SleepCycleViewModel @Inject constructor(
     }
 
     fun removeSleepTime(id: Long) {
-        try {
-            val result = sleepTimeRepository.deleteSleepTime(id)
+        viewModelScope.launch {
+            try {
+                val result = sleepTimeRepository.deleteSleepTimeById(id)
 
-            loadSleepTimes()
+                getAllSleepCycles()
 
-            resetNotifAction()
-            return
-        }
-
-        catch (e: Exception){
-            Log.e("SleepCycleViewModel", e.message.toString())
-            return
+                resetNotifAction()
+            } catch (e: Exception) {
+                Log.e("SleepCycleViewModel", e.message.toString())
+            }
         }
     }
 
-    fun deleteSleepCycle(id: Long){
-        val result = sleepCycleRepository.deleteSleepCycle(id)
+    fun deleteSleepCycle(id: SleepCycle){
+        viewModelScope.launch {
+            try {
+                val result = sleepCycleRepository.deleteSleepCycle(id)
 
-        if(id == activeSleepCycle.value?.id){
-            setActiveSleepCycle(null)
-        }
+                if(id.id == activeSleepCycle.value?.id){
+                    setActiveSleepCycle(null)
+                }
+                getAllSleepCycles()
+                resetNotifAction()
 
-        resetNotifAction()
-        if(result){
-            return
+            } catch (e: Exception) {
+                Log.e("123123123dsdff", e.message.toString())
+            }
         }
-        _errorMessage.value = "Error: Unable to delete sleep cycle."
     }
 
     fun resetNotifAction(){
@@ -174,27 +197,33 @@ class SleepCycleViewModel @Inject constructor(
         return _sleepCycles.value;
     }
 
-    fun toggleActive(id: Long) {
-        // find the sleepCycle
-        val result = sleepCycleRepository.toggleActive(id)
+    fun toggleActive(id: Long, isActive: Int) {
+        viewModelScope.launch {
+            // find the sleepCycle
+            val result = sleepCycleRepository.toggleActive(id, isActive)
 
-        val activeCycle = sleepCycleRepository.getSleepCycleById(id)
-        // set it as active in the viewmodel
-        setActiveSleepCycle(activeCycle)
-        // Profit
-        if (result) {
-            Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
-        } else {
-            _errorMessage.value = "Error: Unable to toggle sleep cycle."
+            val activeCycle = sleepCycleRepository.getActiveSleepCycle()
+            // set it as active in the ViewModel
+            setActiveSleepCycle(activeCycle)
+
+            // Profit
+//            if () {
+//                Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
+//            } else {
+//                _errorMessage.value = "Error: Unable to toggle sleep cycle."
+//            }
         }
     }
 
-
-
     private fun loadSleepTimes() {
         viewModelScope.launch {
-            _sleepTimes.value =
-                sleepCycle.value?.id?.let { sleepCycleRepository.getSleepCycleById(it)?.sleepTimes } as MutableList<SleepTime>?
+            val sleepCycleId = sleepCycle.value?.id
+            if (sleepCycleId != null) {
+                val sleepCycleWithTimes = sleepCycleRepository.getSleepCycleById(sleepCycleId)
+                _sleepTimes.value = sleepCycleWithTimes?.sleepTimes?.toMutableList() ?: mutableListOf()
+            } else {
+                _sleepTimes.value = mutableListOf() // Fallback in case there's no selected sleep cycle
+            }
         }
     }
 }
