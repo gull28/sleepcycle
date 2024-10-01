@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 object AppColors {
     val Primary = Color(0xFF0071DD)
+    val LighterBlue = Color(0xFF6AADED)
     val Secondary = Color(0xFF03DAC5)
     val TextPrimary = Color(0xFFEDF1F7)
     val TextSecondary = Color(0xFF717177)

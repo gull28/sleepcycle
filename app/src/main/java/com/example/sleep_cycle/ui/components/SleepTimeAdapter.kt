@@ -1,5 +1,6 @@
 package com.example.sleep_cycle.ui.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,11 +18,14 @@ import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.helper.Time
 import com.example.sleep_cycle.ui.theme.AppColors
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Color
 
 
 @Composable
 fun SleepTimeList(
     sleepTimes: List<SleepTime>,
+    selectedSleepTime: Int?, // position for inclusion
+    setSelectedSleepTime: (position: Int, sleepTime: SleepTime) -> Unit,
     onEditClicked: (position: Int, sleepTime: SleepTime) -> Unit,
     onRemoveClicked: (Int, SleepTime) -> Unit
 ) {
@@ -34,8 +38,10 @@ fun SleepTimeList(
         itemsIndexed(sleepTimes) { index, sleepTime ->
             SleepTimeItem(
                 sleepTime = sleepTime,
+                onClick = { setSelectedSleepTime(index, sleepTime)  },
                 onEditClicked = { onEditClicked(index, sleepTime) },
-                onRemoveClicked = { onRemoveClicked(index, sleepTime) }
+                onRemoveClicked = { onRemoveClicked(index, sleepTime) },
+                isSelected = index == selectedSleepTime // Check if the current item is selected
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -47,15 +53,23 @@ fun SleepTimeList(
 fun SleepTimeItem(
     sleepTime: SleepTime,
     onEditClicked: () -> Unit,
-    onRemoveClicked: () -> Unit
+    onRemoveClicked: () -> Unit,
+    onClick: () -> Unit,
+    isSelected: Boolean // Add a parameter to check if the item is selected
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .border(
+                width = if (isSelected) 2.dp else 0.dp, // Set border width based on selection
+                color = if (isSelected) AppColors.Primary else Color.Transparent, // Set color based on selection
+                shape = RoundedCornerShape(13.dp) // Use the same shape as the card
+            ),
         colors = CardDefaults.cardColors(containerColor = AppColors.Accent),
         shape = RoundedCornerShape(13.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier
@@ -88,12 +102,10 @@ fun SleepTimeItem(
                     color = AppColors.TextSecondary,
                     style = MaterialTheme.typography.bodyMedium
                 )
-
             }
 
             Row(
                 modifier = Modifier.align(Alignment.CenterVertically)
-
             ) {
                 IconButton(
                     onClick = onEditClicked,
@@ -108,7 +120,6 @@ fun SleepTimeItem(
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
-
 
                 IconButton(
                     onClick = onRemoveClicked,

@@ -1,5 +1,6 @@
 package com.example.sleep_cycle.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +26,7 @@ interface Vertices {
 }
 
 @Composable
-fun Clock(vertices: List<Vertice>?) {
+fun Clock(vertices: List<Vertice>?, selectedVertice: Vertice?) {
     var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
 
     LaunchedEffect(Unit) {
@@ -81,12 +82,15 @@ fun Clock(vertices: List<Vertice>?) {
                 clockHandLocation >= vertice.start && clockHandLocation <= vertice.end
             }
 
+            val isSelected = selectedVertice?.let {
+                areAnglesEqual(vertice.start, vertice.end, it.start, it.end)
+            } ?: false
 
 
-            val sliceColor = if (isHandWithinVertice) {
-                AppColors.Primary.copy(alpha = pulseAlpha)
-            } else {
-                AppColors.Primary
+            val sliceColor = when {
+                isSelected -> AppColors.LighterBlue
+                isHandWithinVertice -> AppColors.Primary.copy(alpha = pulseAlpha)
+                else -> AppColors.Primary
             }
 
             drawSlice(size = size, startAngle = startAngle, sweepAngle = sweepAngle, color = sliceColor)
@@ -94,6 +98,10 @@ fun Clock(vertices: List<Vertice>?) {
 
         drawClockHand(size = size, angle = clockHandLocation)
     }
+}
+
+fun areAnglesEqual(start1: Int, end1: Int, start2: Int, end2: Int): Boolean {
+    return (start1 == start2 && end1 == end2) || (start1 == end2 && end1 == start2)
 }
 
 fun DrawScope.drawClockFace(size: Size) {

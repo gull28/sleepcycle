@@ -38,18 +38,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewModel) {
     val sleepTimes = remember { mutableStateListOf<SleepTime>() }
+    val editedSleepTime = remember { mutableStateOf<Int?>(null) }
     val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
+
     val name = remember { mutableStateOf("") }
     val localContext = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val vertices = sleepTimes.map { time ->
-        time.getVertice()
+    val selectedVertice = selectedSleepTime.value?.let { index ->
+        sleepTimes.getOrNull(index)?.getVertice()
     }
 
     rememberCoroutineScope()
     val showDialog = remember { mutableStateOf(false) }
 
+    Surface(
+        modifier = Modifier.fillMaxSize().background(AppColors.Background),
+        color = AppColors.Background
+    ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,8 +69,10 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
         ){
-            Clock(vertices = vertices)
-
+            Clock(vertices = sleepTimes.map {
+                it.getVertice() },
+                selectedVertice = selectedVertice,
+            )
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -88,11 +96,14 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             SleepTimeList(
                 sleepTimes = sleepTimes,
                 onEditClicked = { position, sleepTime ->
-                    selectedSleepTime.value = position
+                    editedSleepTime.value = position
                     showDialog.value = true
                 },
-                onRemoveClicked = { position: Int, sleepTime: SleepTime ->
-                    Log.d("sleeptime length", sleepTimes.toString())
+                selectedSleepTime = selectedSleepTime.value,
+                setSelectedSleepTime = { position, _ ->
+                    selectedSleepTime.value = position
+                },
+                onRemoveClicked = { position: Int, _: SleepTime ->
                     sleepTimes.removeAt(position)
                 }
             )
@@ -179,7 +190,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
         }
 
         if (showDialog.value) {
-            val currentSleepTime = selectedSleepTime.value?.let { sleepTimes[it] }
+            val currentSleepTime = editedSleepTime.value?.let { sleepTimes[it] }
             TimeInputDialog(
                 sleepTime = currentSleepTime,
                 setShowDialog = { showDialog.value = it },
@@ -201,7 +212,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                         return@TimeInputDialog
                     }
 
-                    selectedSleepTime.value?.let { index ->
+                    editedSleepTime.value?.let { index ->
                         sleepTimes[index] = newSleepTime
                     } ?: run {
                         sleepTimes.add(newSleepTime)
@@ -212,7 +223,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
             )
         }
     }
-}
+}}
 
 
 

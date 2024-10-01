@@ -39,15 +39,16 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
         isLoading = false
     }
 
-    // Track whether to show the overlay
     val hasSeenOverlay by preferences.batteryInfoShownFlow.collectAsState(initial = false)
     val showOverlay = !hasSeenOverlay
 
-    Box(
+    Surface(
         modifier = Modifier
             .fillMaxSize()
             .background(color = AppColors.Background)
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 8.dp),
+        color = AppColors.Background
+
     ) {
         Column(
             modifier = Modifier
@@ -87,7 +88,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                     Timer(cycle = activeSleepCycle!!)
                     Spacer(modifier = Modifier.height(16.dp))
                 } else {
-                    Clock(vertices = activeSleepCycle!!.getSleepTimeVertices())
+                    Clock(vertices = activeSleepCycle!!.getSleepTimeVertices(), selectedVertice = null)
                 }
             } else if (activeSleepCycle == null){
                 Text(
@@ -133,8 +134,7 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
@@ -188,7 +188,7 @@ fun OverlayMessage(onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.Background.copy(alpha = 0.33f)) // Slightly grayed out background
+            .background(AppColors.Background.copy(alpha = 0.33f))
     ) {
         Column(
             modifier = Modifier
@@ -196,10 +196,10 @@ fun OverlayMessage(onDismiss: () -> Unit) {
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
                 .background(
-                    AppColors.Background.copy(alpha = 0.95f), // Slightly transparent for the overlay
+                    AppColors.Background.copy(alpha = 0.95f),
                     RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                 )
-                .fillMaxHeight(0.30f), // Adjust to the desired height
+                .fillMaxHeight(0.30f),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

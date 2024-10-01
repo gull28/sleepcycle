@@ -40,11 +40,13 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
     val errorMessage by viewModel.errorMessage.observeAsState()
 
     val showDialog = remember { mutableStateOf(false) }
-    val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
+    val editedSleepTime = remember { mutableStateOf<Int?>(null) }
+    val selectedSleepTime = remember { mutableStateOf<Int?>(null)}
 
-    LaunchedEffect(sleepCycle?.sleepTimes) {
-        Log.d("sleep change", sleepCycle?.sleepTimes.toString())
+    val selectedVertice = selectedSleepTime.value?.let { index ->
+        sleepTimes.getOrNull(index)?.getVertice()
     }
+
 
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
@@ -66,8 +68,9 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             modifier = Modifier.weight(1f)
         ) {
             Clock(vertices = sleepTimes.map {
-                it.getVertice()
-            })
+                it.getVertice() },
+                selectedVertice = selectedVertice,
+            )
 
             Text(
                 text = sleepCycle?.name ?: "Unknown",
@@ -81,6 +84,14 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 sleepTimes = sleepTimes,
                 onEditClicked = { position, sleepTime ->
                     showDialog.value = true
+                    editedSleepTime.value = position
+                },
+                selectedSleepTime = selectedSleepTime.value,
+                setSelectedSleepTime = { position: Int, _: SleepTime ->
+                    if(position == selectedSleepTime.value){
+                        selectedSleepTime.value = null
+                        return@SleepTimeList
+                    }
                     selectedSleepTime.value = position
                 },
                 onRemoveClicked = { _, sleepTime ->
@@ -90,8 +101,6 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 }
             )
         }
-        
-        Text(text = sleepCycle?.id.toString(), color = AppColors.Slate)
 
         Row(
             modifier = Modifier.padding(bottom = 20.dp)
@@ -154,28 +163,25 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
         }
 
         if (showDialog.value) {
-            val currentSleepTime = selectedSleepTime.value?.let { sleepTimes.getOrNull(it) }
+            val currentSleepTime = editedSleepTime.value?.let { sleepTimes.getOrNull(it) }
             TimeInputDialog(
                 sleepTime = currentSleepTime,
                 onSave = { sleepTime ->
-                    handleSaveSleepTime(sleepTime, viewModel, context, selectedSleepTime.value, navController)
-                    selectedSleepTime.value = null
+                    handleSaveSleepTime(sleepTime, viewModel, context, editedSleepTime.value, navController)
+                    editedSleepTime.value = null
                     viewModel.resetNotifAction()
                 },
                 setShowDialog = {
                     showDialog.value = it
                 },
                 onDismiss = {
-                    selectedSleepTime.value = null
+                    editedSleepTime.value = null
                     showDialog.value = false
                 }
             )
         }
     }
 }
-
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 private fun handleSaveSleepTime(

@@ -16,6 +16,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -106,6 +107,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun requestNotificationPermission() {
         requestPermissionLauncher.launch(POST_NOTIFICATIONS)
     }
@@ -113,10 +115,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Stop the foreground service when the activity is destroyed, if needed
-        // val serviceIntent = Intent(this, ForegroundService::class.java)
-        // stopService(serviceIntent)
+         val serviceIntent = Intent(this, ForegroundService::class.java)
+         stopService(serviceIntent)
     }
 }
 
@@ -143,6 +143,8 @@ fun MainScreen(navController: NavHostController) {
     val shouldShowTopBar = currentRoute !in topBarDeniedRoutes
 
     Scaffold(
+        contentColor = AppColors.Background,
+        containerColor = AppColors.Background,
         topBar = {
             if (shouldShowTopBar) {
                 CustomTopAppBar(navController = navController, showBackButton = true)
@@ -151,7 +153,7 @@ fun MainScreen(navController: NavHostController) {
     ) { innerPadding ->
         AppNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding).background(AppColors.Background)
         )
     }
 }

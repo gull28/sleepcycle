@@ -41,7 +41,7 @@ fun Settings (
                 text = "Clock/Timer",
                 color = AppColors.Slate,
                 fontWeight = FontWeight(400),
-                fontSize = 24.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.weight(1f)
             )
             Switch(
