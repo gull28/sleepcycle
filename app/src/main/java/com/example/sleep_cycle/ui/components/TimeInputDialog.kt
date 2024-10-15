@@ -122,7 +122,6 @@ fun TimeInputDialog(
                             duration = duration
                         )
 
-                        Log.d("123849375", sleep.toString())
                         onSave(sleep)
                         onDismiss()
                     } else {

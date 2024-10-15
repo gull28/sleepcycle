@@ -4,6 +4,7 @@ import TimeRange
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,7 +58,6 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                 .padding(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,7 +103,9 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                     text = "No sleep times found.",
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
-                    modifier = Modifier.padding(vertical = 24.dp).padding(bottom = 48.dp)
+                    modifier = Modifier
+                        .padding(vertical = 24.dp)
+                        .padding(bottom = 48.dp)
                 )
 
                 Button(
@@ -166,6 +169,23 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
                 }
             }
 
+            Row (
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth().padding(
+                    top = 10.dp,
+                    bottom = 4.dp,
+                )
+            ) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                    ),
+                    onClick = {
+                    navController.navigate("sleepCycleListScreen")
+                }) {
+                    Text(fontSize = 16.sp, text = "View all", color = AppColors.Primary)
+                }
+            }
             SleepCycleList(
                 sleepCycles = sleepCycles,
                 navController = navController,
@@ -221,7 +241,9 @@ fun OverlayMessage(onDismiss: () -> Unit) {
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
-                modifier = Modifier.fillMaxWidth(0.75f).padding(bottom = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .padding(bottom = 20.dp),
                 shape = RoundedCornerShape(15.dp),
             ) {
                 Text(text = "Got it!")

@@ -17,6 +17,7 @@ import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.screens.HomeScreen
 import com.example.sleep_cycle.ui.screens.NewCycleFragment
 import com.example.sleep_cycle.ui.screens.Settings
+import com.example.sleep_cycle.ui.screens.SleepCycleListFragment
 import com.example.sleep_cycle.ui.screens.SleepCycleScreen
 import com.example.sleep_cycle.ui.theme.AppColors
 
@@ -74,7 +75,16 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                 popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
             ) {
-                Settings(navController = navController, preferences = preferences)
+                Settings(navController, preferences = preferences)
+            }
+            composable(
+                "sleepCycleListScreen",
+                enterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                exitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
+                popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
+                ){
+                SleepCycleListFragment(navController, viewModel)
             }
         }
     }

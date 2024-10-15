@@ -43,7 +43,7 @@ fun SleepCycleList(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(vertical = 24.dp)
+            .padding(bottom = 24.dp)
     ) {
         items(sleepCycles) { cycle ->
             SleepCycleItem(

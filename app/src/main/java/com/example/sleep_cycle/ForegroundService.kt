@@ -17,6 +17,7 @@ import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.sleep_cycle.data.models.SleepTime
@@ -63,6 +64,8 @@ class ForegroundService : Service() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == "UPDATE_SLEEP_CYCLE") {
+                countdownTimer?.cancel()
+                countdownTimer = null
                 fetchAndUpdateSleepTimes()
             }
         }
@@ -134,6 +137,7 @@ class ForegroundService : Service() {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
                         vibrator.vibrate(vibrationEffect)
+
                     } else {
                         vibrator.vibrate(500)
                     }

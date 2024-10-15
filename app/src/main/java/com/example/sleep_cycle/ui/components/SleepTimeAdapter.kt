@@ -55,16 +55,16 @@ fun SleepTimeItem(
     onEditClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
     onClick: () -> Unit,
-    isSelected: Boolean // Add a parameter to check if the item is selected
+    isSelected: Boolean
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .border(
-                width = if (isSelected) 2.dp else 0.dp, // Set border width based on selection
-                color = if (isSelected) AppColors.Primary else Color.Transparent, // Set color based on selection
-                shape = RoundedCornerShape(13.dp) // Use the same shape as the card
+                width = if (isSelected) 2.dp else 0.dp,
+                color = if (isSelected) AppColors.Primary else Color.Transparent,
+                shape = RoundedCornerShape(13.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = AppColors.Accent),
         shape = RoundedCornerShape(13.dp),
