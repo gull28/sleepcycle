@@ -3,6 +3,7 @@ package com.example.sleep_cycle.helper
 
 import android.util.Log
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -25,6 +26,10 @@ class Time(private val minutes: Int) {
             val seconds = 0
 
             return String.format("%02d:%02d", hours, remainingMinutes, seconds)
+        }
+
+        fun isPassingMidnight(start: LocalTime, end: LocalTime): Boolean {
+            return end.isBefore(start)
         }
 
         fun getTimeUntil(timeInFuture: Calendar): Long {

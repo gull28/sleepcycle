@@ -1,6 +1,7 @@
 package com.example.sleep_cycle.data.models
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -82,12 +83,31 @@ data class SleepTime(
         val startTimeToCheck = LocalTime.parse(timeStart, formatter)
         val endTimeToCheck = LocalTime.parse(timeEnd, formatter)
 
-        return if (end.isBefore(start)) {
-            (startTimeToCheck.isAfter(start) || startTimeToCheck == start) ||
-                    (endTimeToCheck.isBefore(end))
-        } else {
-            (startTimeToCheck.isAfter(start) || startTimeToCheck == start) &&
-                    (endTimeToCheck.isBefore(end))
+        val isExistingCrossingMidnight = start.isAfter(end)
+        val isNewCrossingMidnight = startTimeToCheck.isAfter(endTimeToCheck)
+
+        // if both cross midnight, both overlap
+        if (isExistingCrossingMidnight && isNewCrossingMidnight) {
+            return true
         }
+
+        if (isNewCrossingMidnight) {
+            return (start.isBefore(endTimeToCheck) || end.isBefore(endTimeToCheck)) ||
+                    (start.isAfter(startTimeToCheck) || end.isAfter(startTimeToCheck))
+        }
+
+        // only the existing interval crosses midnight
+        if (isExistingCrossingMidnight) {
+            return (startTimeToCheck.isBefore(end) || endTimeToCheck.isBefore(end)) ||
+                    (startTimeToCheck.isAfter(start) || endTimeToCheck.isAfter(start))
+        }
+
+        // neither time crosses midnight — standard overlap check
+        // check if startTimeToCheck/endTimeToCheck is within start/end time frame
+        // check if startTimeToCheck/endTimeToCheck envelops start/end
+        return (startTimeToCheck.isBefore(end) && startTimeToCheck.isAfter(start)) ||
+                (endTimeToCheck.isBefore(end) && endTimeToCheck.isAfter(start)) ||
+                (startTimeToCheck.isBefore(start) && endTimeToCheck.isAfter(end))
     }
+
 }

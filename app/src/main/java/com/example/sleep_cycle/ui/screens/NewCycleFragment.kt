@@ -203,11 +203,13 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                     val isValidName = newSleepTime.name.isNotEmpty() && sleepTimes.none { it.name == newSleepTime.name }
 
                     if(!isValidName){
+                        editedSleepTime.value = null
                         Toast.makeText(localContext, "Please fill name correctly", Toast.LENGTH_SHORT).show()
                         return@TimeInputDialog
                     }
 
                     if(isValidSleepTime != null){
+                        editedSleepTime.value = null
                         Toast.makeText(localContext, "Please don't use overlapping sleep times", Toast.LENGTH_SHORT).show()
                         return@TimeInputDialog
                     }
