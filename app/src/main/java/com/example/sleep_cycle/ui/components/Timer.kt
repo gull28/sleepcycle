@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sleep_cycle.data.models.SleepCycle
-import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.helpers.Time
 import kotlinx.coroutines.delay
 import com.example.sleep_cycle.ui.theme.AppColors
 import java.time.LocalTime

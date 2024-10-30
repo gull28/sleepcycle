@@ -8,32 +8,32 @@ import com.example.sleep_cycle.data.models.SleepCycle
 interface SleepCycleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addSleepCycle(sleepCycle: SleepCycle): Long
+    open suspend fun addSleepCycle(sleepCycle: SleepCycle)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSleepTimes(sleepTimes: List<SleepTime>)
+    open suspend fun insertSleepTimes(sleepTimes: List<SleepTime>)
 
     @Transaction
-    suspend fun addSleepCycleWithTimes(sleepCycle: SleepCycle, sleepTimes: List<SleepTime>) {
+    open suspend fun addSleepCycleWithTimes(sleepCycle: SleepCycle, sleepTimes: List<SleepTime>) {
         val cycleId = addSleepCycle(sleepCycle)
         val timesWithCycleId = sleepTimes.map { it.copy(scheduleId = cycleId) }
         insertSleepTimes(timesWithCycleId)
     }
 
     @Query("UPDATE sleep_cycles SET isActive = :isActive WHERE id = :id")
-    suspend fun toggleActive(id: Long, isActive: Int)
+    open suspend fun toggleActive(id: Long, isActive: Int)
 
     @Query("DELETE FROM sleep_times WHERE scheduleId = :scheduleId")
-    suspend fun deleteSleepTimesByScheduleId(scheduleId: Long)
+    open suspend fun deleteSleepTimesByScheduleId(scheduleId: Long)
 
     @Transaction
-    suspend fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>) {
+    open suspend fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>) {
         deleteSleepTimesByScheduleId(cycleId)
         insertSleepTimes(sleepTimes)
     }
 
     @Transaction
-    suspend fun toggleActiveCycle(id: Long, isActive: Int) {
+    open suspend fun toggleActiveCycle(id: Long, isActive: Int) {
         unsetAllActiveCycles()
 
         if (isActive == 1) {

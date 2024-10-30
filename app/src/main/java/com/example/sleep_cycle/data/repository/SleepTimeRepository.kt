@@ -3,10 +3,10 @@ package com.example.sleep_cycle.data.repository
 import com.example.sleep_cycle.data.dao.SleepTimeDao
 import com.example.sleep_cycle.data.models.SleepTime
 
-class SleepTimeRepository(private val sleepTimeDao: SleepTimeDao) {
+open class SleepTimeRepository(private val sleepTimeDao: SleepTimeDao) {
 
-    suspend fun addSleepTime(sleepTime: SleepTime): Long {
-        return sleepTimeDao.addSleepTime(sleepTime)
+    open suspend fun addSleepTime(sleepTime: SleepTime) {
+        sleepTimeDao.addSleepTime(sleepTime)
     }
 
     suspend fun getSleepTimeById(id: Long): SleepTime? {
@@ -17,7 +17,7 @@ class SleepTimeRepository(private val sleepTimeDao: SleepTimeDao) {
         return sleepTimeDao.getAllSleepTimes()
     }
 
-    suspend fun updateSleepTime(sleepTime: SleepTime): Int {
+    open suspend fun updateSleepTime(sleepTime: SleepTime): Int {
         return sleepTimeDao.updateSleepTime(sleepTime)
     }
 
@@ -25,7 +25,7 @@ class SleepTimeRepository(private val sleepTimeDao: SleepTimeDao) {
         return sleepTimeDao.deleteSleepTime(sleepTime)
     }
 
-    suspend fun deleteSleepTimeById(id: Long): Int {
-        return sleepTimeDao.deleteSleepTimeById(id)
+    open suspend fun deleteSleepTimeById(id: Long) {
+        sleepTimeDao.deleteSleepTimeById(id)
     }
 }

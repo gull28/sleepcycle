@@ -17,12 +17,11 @@ import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
-import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.helpers.Time
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

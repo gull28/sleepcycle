@@ -49,8 +49,16 @@ android {
 
 dependencies {
     implementation(libs.hilt.android)
+    implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.transport.runtime)
+    androidTestImplementation(libs.hilt.android.testing)
+
+
     implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation(libs.androidx.room.common)
+    androidTestImplementation(project(":app"))
+    androidTestImplementation(project(":app"))
+
 
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.room.compiler)
@@ -89,8 +97,14 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.espresso.core.v350)
+
+    testImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.android)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.core.testing)
+
 }
 
 kapt {

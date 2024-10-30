@@ -1,13 +1,12 @@
 package com.example.sleep_cycle.data.models
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.helpers.Time
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar

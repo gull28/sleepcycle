@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Ignore
 
-import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.helpers.Time
 import java.util.Calendar
 
 @Entity(tableName = "sleep_cycles")

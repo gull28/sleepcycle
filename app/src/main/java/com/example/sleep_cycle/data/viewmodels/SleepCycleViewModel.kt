@@ -22,7 +22,7 @@ import android.content.Context
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 
 @HiltViewModel
-class SleepCycleViewModel @Inject constructor(
+open class SleepCycleViewModel @Inject constructor(
     private val sleepCycleRepository: SleepCycleRepository,
     private val sleepTimeRepository: SleepTimeRepository,
     @ApplicationContext private val appContext: Context,
@@ -40,7 +40,7 @@ class SleepCycleViewModel @Inject constructor(
 
     // set all cycles
     private val _sleepCycles = MutableLiveData<List<SleepCycle>>()
-    val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
+    open val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
 
     // this is selected  sleep cycle
     private val _sleepCycle = MutableLiveData<SleepCycle?>()
@@ -98,7 +98,7 @@ class SleepCycleViewModel @Inject constructor(
         }
     }
 
-    fun addSleepCycle(sleepCycle: SleepCycle) {
+    open fun addSleepCycle(sleepCycle: SleepCycle) {
         viewModelScope.launch {
             sleepCycleRepository.addSleepCycleWithTimes(sleepCycle)
         }

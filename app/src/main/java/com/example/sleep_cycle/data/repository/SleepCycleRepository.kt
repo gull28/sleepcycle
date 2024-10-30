@@ -5,7 +5,7 @@ import com.example.sleep_cycle.data.dao.SleepCycleDao
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.models.SleepCycle
 
-class SleepCycleRepository(private val sleepCycleDao: SleepCycleDao) {
+open class SleepCycleRepository(private val sleepCycleDao: SleepCycleDao) {
 
     suspend fun addSleepCycle(sleepCycle: SleepCycle): Long {
         return sleepCycleDao.addSleepCycle(sleepCycle)

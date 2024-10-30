@@ -44,6 +44,4 @@ class PreferenceViewModel @Inject constructor(
             preference.setDatabaseSeeded()
         }
     }
-
-
 }

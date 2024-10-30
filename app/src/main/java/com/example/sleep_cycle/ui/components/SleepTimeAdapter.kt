@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sleep_cycle.data.models.SleepTime
-import com.example.sleep_cycle.helper.Time
+import com.example.sleep_cycle.helpers.Time
 import com.example.sleep_cycle.ui.theme.AppColors
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
