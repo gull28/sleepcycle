@@ -19,18 +19,24 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.content.Context
+import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 
 @HiltViewModel
 open class SleepCycleViewModel @Inject constructor(
     private val sleepCycleRepository: SleepCycleRepository,
     private val sleepTimeRepository: SleepTimeRepository,
+    private val toaster: Toaster,
     @ApplicationContext private val appContext: Context,
 
     ) : ViewModel() {
 
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
+    }
+
+    fun showToast(message: String) {
+        toaster.showToast(message)
     }
 
     override fun onCleared() {

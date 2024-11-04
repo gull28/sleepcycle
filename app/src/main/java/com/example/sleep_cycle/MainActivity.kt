@@ -56,6 +56,8 @@ class MainActivity : ComponentActivity() {
 
     private val preferenceViewModel: PreferenceViewModel by viewModels()
 
+    lateinit var navController: NavHostController
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +81,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxHeight(),
                 color = AppColors.Background
             ) {
-                val navController = rememberNavController()
+                navController = rememberNavController()
                 MainScreen(navController)
             }
         }

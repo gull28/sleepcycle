@@ -4,17 +4,20 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.sleep_cycle.data.models.SleepCycle
+import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
+import com.example.sleep_cycle.modules.FakeToaster
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class MockSleepCycleViewModel(
-    private val sleepCycleRepository: SleepCycleRepository,
-    private val sleepTimeRepository: SleepTimeRepository,
-    @ApplicationContext private val appContext: Context
-) : SleepCycleViewModel(sleepCycleRepository, sleepTimeRepository, appContext) {
-
+class MockSleepCycleViewModel @Inject constructor(
+    sleepCycleRepository: SleepCycleRepository,
+    sleepTimeRepository: SleepTimeRepository,
+    toaster: Toaster,
+    @ApplicationContext appContext: Context
+) : SleepCycleViewModel(sleepCycleRepository, sleepTimeRepository, toaster, appContext) {
     private val _testSleepCycles = MutableLiveData<List<SleepCycle>>(emptyList())
     override val sleepCycles: LiveData<List<SleepCycle>> get() = _testSleepCycles
 

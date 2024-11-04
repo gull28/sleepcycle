@@ -7,8 +7,8 @@ import com.example.sleep_cycle.data.models.SleepCycle
 
 open class SleepCycleRepository(private val sleepCycleDao: SleepCycleDao) {
 
-    suspend fun addSleepCycle(sleepCycle: SleepCycle): Long {
-        return sleepCycleDao.addSleepCycle(sleepCycle)
+    suspend fun addSleepCycle(sleepCycle: SleepCycle) {
+        sleepCycleDao.addSleepCycle(sleepCycle)
     }
 
     suspend fun getSleepCycleById(id: Long): SleepCycle? {

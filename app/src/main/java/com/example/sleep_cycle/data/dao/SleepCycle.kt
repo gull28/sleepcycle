@@ -8,7 +8,7 @@ import com.example.sleep_cycle.data.models.SleepCycle
 interface SleepCycleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    open suspend fun addSleepCycle(sleepCycle: SleepCycle)
+    open suspend fun addSleepCycle(sleepCycle: SleepCycle): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     open suspend fun insertSleepTimes(sleepTimes: List<SleepTime>)

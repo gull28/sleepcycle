@@ -13,7 +13,7 @@ data class SleepCycle(
     val id: Long = 0,  // Primary key for Room
 
     val name: String,
-    val isActive: Int = 0
+    var isActive: Int = 0
 ) {
     @Ignore
     var sleepTimes: List<SleepTime> = emptyList()

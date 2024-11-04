@@ -1,6 +1,7 @@
 package com.example.sleep_cycle.data.models
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -26,7 +27,7 @@ interface Vertice {
     )]
 )
 data class SleepTime(
-    @PrimaryKey(autoGenerate = true) val id: Long? = null,
+    @PrimaryKey(autoGenerate = true) var id: Long? = null,
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "scheduleId", index = true) var scheduleId: Long? = null, // Foreign key
     @ColumnInfo(name = "start_time") var startTime: String = "",
@@ -84,6 +85,15 @@ data class SleepTime(
 
         val isExistingCrossingMidnight = start.isAfter(end)
         val isNewCrossingMidnight = startTimeToCheck.isAfter(endTimeToCheck)
+
+        // check if start/end is the same
+        if(start == startTimeToCheck) {
+            return true
+        }
+
+        if(end == endTimeToCheck){
+            return true
+        }
 
         // if both cross midnight, both overlap
         if (isExistingCrossingMidnight && isNewCrossingMidnight) {

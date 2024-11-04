@@ -1,5 +1,4 @@
 import android.app.TimePickerDialog
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.ui.theme.AppColors
@@ -24,7 +24,7 @@ fun TimeInputDialog(
 
     var name by remember { mutableStateOf(TextFieldValue(sleepTime?.name ?: "")) }
     var startTime by remember { mutableStateOf(sleepTime?.startTime ?: "00:00:00") }
-    var duration by remember { mutableStateOf(sleepTime?.duration ?: 0) }
+    var duration by remember { mutableIntStateOf(sleepTime?.duration ?: 0) }
 
     fun openStartTimePicker() {
         val calendar = Calendar.getInstance()
@@ -69,7 +69,9 @@ fun TimeInputDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("name_input"),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = AppColors.Slate.copy(alpha = 0.75f),
                         focusedBorderColor = AppColors.Primary,
@@ -82,7 +84,9 @@ fun TimeInputDialog(
 
                 Button(
                     onClick = { openStartTimePicker() },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("time_select"),
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppColors.Primary
@@ -94,7 +98,9 @@ fun TimeInputDialog(
 
                 Button(
                     onClick = { openDurationPicker() },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("duration_select"),
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppColors.Primary
@@ -130,7 +136,8 @@ fun TimeInputDialog(
                 },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .testTag("save_time"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppColors.Primary
                 ),

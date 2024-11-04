@@ -28,11 +28,13 @@ import androidx.navigation.NavController
 
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.models.SleepCycle
+import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import com.example.sleep_cycle.ui.theme.AppColors
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -126,11 +128,10 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                         sleepCycle.sleepTimes = sleepTimes
 
                         if (sleepCycle.name.isEmpty()) {
-                            Toast.makeText(localContext, "Please enter the correct name", Toast.LENGTH_SHORT).show()
+                            viewModel.showToast("Please enter the correct name")
                             return@Button
                         }
 
-                        // Launch a coroutine to call the suspend function
                         coroutineScope.launch {
                             viewModel.addSleepCycle(sleepCycle = sleepCycle)
                             navController.navigate("home")
@@ -204,13 +205,13 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
 
                     if(!isValidName){
                         editedSleepTime.value = null
-                        Toast.makeText(localContext, "Please fill name correctly", Toast.LENGTH_SHORT).show()
+                        viewModel.showToast("Please fill name correctly")
                         return@TimeInputDialog
                     }
 
                     if(isValidSleepTime != null){
                         editedSleepTime.value = null
-                        Toast.makeText(localContext, "Please don't use overlapping sleep times", Toast.LENGTH_SHORT).show()
+                        viewModel.showToast( "Please don't use overlapping sleep times")
                         return@TimeInputDialog
                     }
 

@@ -7,40 +7,62 @@ import com.example.sleep_cycle.data.models.SleepTime
 class MockSleepCycleDao : SleepCycleDao {
     private val sleepCycles = mutableListOf<SleepCycle>()
 
-    override suspend fun addSleepCycle(sleepCycle: SleepCycle) {
+    override suspend fun addSleepCycle(sleepCycle: SleepCycle): Long {
         sleepCycles.add(sleepCycle)
+
+        return sleepCycle.id
     }
 
     override suspend fun insertSleepTimes(sleepTimes: List<SleepTime>) {
-        TODO("Not yet implemented")
+        val sleepCycle = sleepCycles.find { it.id == sleepTimes[0].scheduleId }
+
+        if (sleepCycle != null) {
+            sleepCycle.sleepTimes = sleepTimes
+        }
     }
 
     override suspend fun toggleActive(id: Long, isActive: Int) {
-        TODO("Not yet implemented")
+        val currentlyActiveCycle = sleepCycles.find { it.isActive == 1 }
+
+        if(currentlyActiveCycle != null && currentlyActiveCycle.id != id) {
+            currentlyActiveCycle.isActive = 0
+        }
+
+        val activeCycle = sleepCycles.find { it.id == id }
+
+        if (activeCycle != null) {
+            activeCycle.isActive = 1
+        }
     }
 
     override suspend fun deleteSleepTimesByScheduleId(scheduleId: Long) {
-        TODO("Not yet implemented")
+        sleepCycles.removeIf { it.id == scheduleId }
     }
 
     override suspend fun unsetAllActiveCycles() {
-        TODO("Not yet implemented")
+        sleepCycles.map { it.isActive = 0 }
     }
 
     override suspend fun getSleepCycleById(id: Long): SleepCycle? {
-        TODO("Not yet implemented")
+        return sleepCycles.find { it.id == id }
     }
 
     override suspend fun getSleepTimesForCycle(scheduleId: Long): List<SleepTime> {
-        TODO("Not yet implemented")
+        return getSleepCycleById(scheduleId)?.sleepTimes ?: listOf()
     }
 
     override suspend fun getAllSleepCyclesRaw(): List<SleepCycle> {
-        TODO("Not yet implemented")
+        return sleepCycles
     }
 
     override suspend fun updateSleepCycle(sleepCycle: SleepCycle): Int {
-        TODO("Not yet implemented")
+        val index = sleepCycles.indexOfFirst { it.id == sleepCycle.id }
+        return if (index != -1) {
+            sleepCycles[index] = sleepCycle
+            1
+        } else {
+            0
+        }
     }
 
     override suspend fun deleteSleepCycle(sleepCycle: SleepCycle) {
@@ -48,6 +70,9 @@ class MockSleepCycleDao : SleepCycleDao {
     }
 
     override suspend fun deleteSleepCycleById(id: Long) {
-        TODO("Not yet implemented")
+        val itemToRemove = sleepCycles.find { it.id == id }
+        if (itemToRemove != null) {
+            sleepCycles.remove(itemToRemove)
+        }
     }
 }
