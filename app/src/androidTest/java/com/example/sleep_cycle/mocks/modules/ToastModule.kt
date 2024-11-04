@@ -1,4 +1,4 @@
-package com.example.sleep_cycle.modules
+package com.example.sleep_cycle.mocks.modules
 
 import com.example.sleep_cycle.data.modules.ToastModule
 import com.example.sleep_cycle.data.modules.Toaster

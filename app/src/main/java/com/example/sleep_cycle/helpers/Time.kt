@@ -1,6 +1,8 @@
 // Time.kt
 package com.example.sleep_cycle.helpers
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.util.Calendar
@@ -26,6 +28,7 @@ class Time(private val minutes: Int) {
             return String.format("%02d:%02d", hours, remainingMinutes, seconds)
         }
 
+        @RequiresApi(Build.VERSION_CODES.O)
         fun isPassingMidnight(start: LocalTime, end: LocalTime): Boolean {
             return end.isBefore(start)
         }

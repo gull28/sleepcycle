@@ -1,4 +1,4 @@
-package com.example.sleep_cycle.dao
+package com.example.sleep_cycle.mocks.dao
 
 import com.example.sleep_cycle.data.dao.SleepTimeDao
 import com.example.sleep_cycle.data.models.SleepTime

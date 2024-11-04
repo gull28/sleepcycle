@@ -2,16 +2,16 @@
 package com.example.sleep_cycle
 
 import android.content.Context
-import com.example.sleep_cycle.dao.MockSleepCycleDao
-import com.example.sleep_cycle.dao.MockSleepTimeDao
+import com.example.sleep_cycle.mocks.dao.MockSleepCycleDao
+import com.example.sleep_cycle.mocks.dao.MockSleepTimeDao
 import com.example.sleep_cycle.data.modules.SleepCycleModule
-import com.example.sleep_cycle.repository.FakeSleepCycleRepository
-import com.example.sleep_cycle.repository.FakeSleepTimeRepository
+import com.example.sleep_cycle.mocks.repository.FakeSleepCycleRepository
+import com.example.sleep_cycle.mocks.repository.FakeSleepTimeRepository
 import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
-import com.example.sleep_cycle.modules.FakeToaster
-import com.example.sleep_cycle.viewmodel.MockSleepCycleViewModel
+import com.example.sleep_cycle.mocks.modules.FakeToaster
+import com.example.sleep_cycle.mocks.viewmodel.MockSleepCycleViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

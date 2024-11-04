@@ -31,7 +31,7 @@ data class SleepTime(
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "scheduleId", index = true) var scheduleId: Long? = null, // Foreign key
     @ColumnInfo(name = "start_time") var startTime: String = "",
-    @ColumnInfo(name = "duration") val duration: Int = 20
+    @ColumnInfo(name = "duration") var duration: Int = 20
 ) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateEndTime(): String {

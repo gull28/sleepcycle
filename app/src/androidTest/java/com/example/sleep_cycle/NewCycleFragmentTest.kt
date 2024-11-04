@@ -17,8 +17,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sleep_cycle.modules.FakeToaster
-import com.example.sleep_cycle.viewmodel.MockSleepCycleViewModel
+import com.example.sleep_cycle.mocks.modules.FakeToaster
+import com.example.sleep_cycle.mocks.viewmodel.MockSleepCycleViewModel
 import com.example.sleep_cycle.MainActivity
 import com.example.sleep_cycle.data.modules.Toaster
 import dagger.hilt.android.testing.HiltAndroidRule

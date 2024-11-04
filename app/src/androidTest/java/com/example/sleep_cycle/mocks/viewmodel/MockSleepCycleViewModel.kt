@@ -1,4 +1,4 @@
-package com.example.sleep_cycle.viewmodel
+package com.example.sleep_cycle.mocks.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -8,7 +8,7 @@ import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
-import com.example.sleep_cycle.modules.FakeToaster
+import com.example.sleep_cycle.mocks.modules.FakeToaster
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
