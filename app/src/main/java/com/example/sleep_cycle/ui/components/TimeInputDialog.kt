@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.sleep_cycle.data.models.SleepTime
+import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.theme.AppColors
 import java.util.*
 
@@ -18,7 +19,8 @@ fun TimeInputDialog(
     sleepTime: SleepTime?,
     setShowDialog: (value: Boolean) -> Unit,
     onSave: (SleepTime) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    sleepCycleViewModel: SleepCycleViewModel
 ) {
     val context = LocalContext.current
 
@@ -131,7 +133,7 @@ fun TimeInputDialog(
                         onSave(sleep)
                         onDismiss()
                     } else {
-                        Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
+                        sleepCycleViewModel.showToast("Please fill all fields correctly")
                     }
                 },
                 shape = MaterialTheme.shapes.medium,

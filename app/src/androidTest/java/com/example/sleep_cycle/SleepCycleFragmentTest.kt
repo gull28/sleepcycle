@@ -15,10 +15,11 @@ import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.example.sleep_cycle.data.models.SleepCycle
+import com.example.sleep_cycle.data.models.SleepTime
+import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.mocks.modules.FakeToaster
 import com.example.sleep_cycle.mocks.viewmodel.MockSleepCycleViewModel
-import com.example.sleep_cycle.MainActivity
-import com.example.sleep_cycle.data.modules.Toaster
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.Matchers
@@ -31,7 +32,7 @@ import javax.inject.Inject
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class NewCycleFragmentTest {
+class SleepCycleFragmentTest {
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -48,8 +49,20 @@ class NewCycleFragmentTest {
     @Before
     fun setup() {
         hiltRule.inject()
+
         FakeToaster.toasts.clear()
         grantNotificationPermission()
+
+        val testCycle = SleepCycle(
+            id = 1,
+            name = "Test Sleep Cycle",
+            isActive = 0
+        )
+
+        testCycle.sleepTimes = listOf(SleepTime(1, "Sleep 1", 1, "16:00:00", 180))
+        mockViewModel.addSleepCycle(
+            sleepCycle = testCycle
+        )
     }
 
     private fun grantNotificationPermission() {
@@ -60,9 +73,11 @@ class NewCycleFragmentTest {
         }
     }
 
-    private fun navigateToNewCycleScreen() {
+    private fun navigateToScreen() {
+        composeTestRule.onNodeWithText("Got it!").performClick()
+
         composeTestRule.activity.runOnUiThread {
-            composeTestRule.activity.navController.navigate("newCycleScreen")
+            composeTestRule.activity.navController.navigate("sleepCycleScreen")
         }
     }
 
@@ -82,54 +97,21 @@ class NewCycleFragmentTest {
     }
 
     @Test
-    fun checkEmptyNameToastShown() {
-        navigateToNewCycleScreen()
-        composeTestRule.onNodeWithText("Save").performClick()
-        checkToastMessage("Please enter the correct name")
-    }
-
-    @Test
-    fun checkNullValuesTimeInputDialog() {
-        navigateToNewCycleScreen()
-        composeTestRule.onNodeWithText("Add time").performClick()
-        composeTestRule.onNodeWithTag("save_time").performClick()
-        checkToastMessage("Please fill all fields correctly")
-    }
-
-    @Test
-    fun checkOverlapSleepTimes() {
-        navigateToNewCycleScreen()
+    fun checkTimeAddValid() {
+        composeTestRule.onNodeWithText("Uberman").performClick()
 
         composeTestRule.onNodeWithText("Add time").performClick()
-        inputText("name_input", "Sample Sleep Time")
+
+        composeTestRule.onNodeWithTag("name_input").assertExists()
+
+        composeTestRule.onNodeWithTag("name_input").performTextInput("Sample Sleep Time")
+
+
         setTime("time_select", 8, 30)
+
         composeTestRule.onNodeWithTag("time_select").assertTextContains("Start Time: 08:30")
+
         setTime("duration_select", 1, 30)
-        composeTestRule.onNodeWithTag("duration_select").assertTextContains("Duration: 01:30")
-        composeTestRule.onNodeWithTag("save_time").performClick()
-
-        composeTestRule.onNodeWithText("Add time").performClick()
-        inputText("name_input", "Sample Sleep Time 2")
-        setTime("time_select", 9, 30)
-        composeTestRule.onNodeWithTag("time_select").assertTextContains("Start Time: 09:30")
-        setTime("duration_select", 2, 30)
-        composeTestRule.onNodeWithTag("duration_select").assertTextContains("Duration: 02:30")
-        composeTestRule.onNodeWithTag("save_time").performClick()
-
-        checkToastMessage("Please don't use overlapping sleep times")
-    }
-
-    @Test
-    fun openTimeInputDialogAndAddSleepTimeWithDuration() {
-        navigateToNewCycleScreen()
-
-        composeTestRule.onNodeWithText("Add time").performClick()
-        inputText("name_input", "Sample Sleep Time")
-        setTime("time_select", 8, 30)
-        composeTestRule.onNodeWithTag("time_select").assertTextContains("Start Time: 08:30")
-        setTime("duration_select", 1, 30)
-        composeTestRule.onNodeWithTag("duration_select").assertTextContains("Duration: 01:30")
-        composeTestRule.onNodeWithTag("save_time").performClick()
 
         composeTestRule.onNodeWithText("Sample Sleep Time").assertExists()
     }

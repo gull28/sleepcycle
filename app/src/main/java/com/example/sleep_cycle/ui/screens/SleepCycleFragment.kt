@@ -177,7 +177,8 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                 onDismiss = {
                     editedSleepTime.value = null
                     showDialog.value = false
-                }
+                },
+                sleepCycleViewModel = viewModel
             )
         }
     }

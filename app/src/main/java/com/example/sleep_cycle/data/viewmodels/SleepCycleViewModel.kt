@@ -178,7 +178,7 @@ open class SleepCycleViewModel @Inject constructor(
         appContext.sendBroadcast(broadcastIntent)
     }
 
-    fun getAllSleepCycles(): List<SleepCycle>? {
+    open fun getAllSleepCycles(): List<SleepCycle>? {
         viewModelScope.launch {
             val cycles = sleepCycleRepository.getAllSleepCycles()
             _sleepCycles.value = cycles

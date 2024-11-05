@@ -8,7 +8,6 @@ import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
-import com.example.sleep_cycle.mocks.modules.FakeToaster
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -18,14 +17,20 @@ class MockSleepCycleViewModel @Inject constructor(
     toaster: Toaster,
     @ApplicationContext appContext: Context
 ) : SleepCycleViewModel(sleepCycleRepository, sleepTimeRepository, toaster, appContext) {
+
     private val _testSleepCycles = MutableLiveData<List<SleepCycle>>(emptyList())
     override val sleepCycles: LiveData<List<SleepCycle>> get() = _testSleepCycles
 
+    override fun getAllSleepCycles(): List<SleepCycle> {
+        return _testSleepCycles.value.orEmpty()
+    }
+
     fun setTestSleepCycles(cycles: List<SleepCycle>) {
-        _testSleepCycles.value = cycles
+        _testSleepCycles.postValue(cycles)
     }
 
     override fun addSleepCycle(sleepCycle: SleepCycle) {
-        _testSleepCycles.value = _testSleepCycles.value.orEmpty() + sleepCycle
+        val updatedList = _testSleepCycles.value.orEmpty() + sleepCycle
+        _testSleepCycles.postValue(updatedList)
     }
 }

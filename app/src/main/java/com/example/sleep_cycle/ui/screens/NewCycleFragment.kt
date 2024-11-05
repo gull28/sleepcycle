@@ -222,7 +222,8 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                     }
 
                 },
-                onDismiss = { showDialog.value = false }
+                onDismiss = { showDialog.value = false },
+                sleepCycleViewModel = viewModel
             )
         }
     }
