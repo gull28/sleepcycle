@@ -3,7 +3,6 @@ package com.example.sleep_cycle.ui.screens
 import TimeInputDialog
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.ui.*
@@ -19,22 +18,18 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.models.SleepCycle
-import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import com.example.sleep_cycle.ui.theme.AppColors
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -44,7 +39,6 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
     val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
 
     val name = remember { mutableStateOf("") }
-    val localContext = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     val selectedVertice = selectedSleepTime.value?.let { index ->

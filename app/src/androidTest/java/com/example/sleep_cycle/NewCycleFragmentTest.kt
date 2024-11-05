@@ -17,11 +17,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sleep_cycle.mocks.modules.FakeToaster
 import com.example.sleep_cycle.mocks.viewmodel.MockSleepCycleViewModel
-import com.example.sleep_cycle.MainActivity
 import com.example.sleep_cycle.data.modules.Toaster
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.hamcrest.Matchers
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule

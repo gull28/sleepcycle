@@ -1,7 +1,6 @@
 package com.example.sleep_cycle.data.models
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -13,8 +12,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 interface Vertice {
-    var start: Int;
-    var end: Int;
+    var start: Int
+    var end: Int
 }
 
 @Entity(
@@ -33,6 +32,11 @@ data class SleepTime(
     @ColumnInfo(name = "start_time") var startTime: String = "",
     @ColumnInfo(name = "duration") var duration: Int = 20
 ) {
+    /**
+     * Calculates the end time based on the start time and duration.
+     *
+     * @return The calculated end time in "HH:mm:ss" format.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateEndTime(): String {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -41,19 +45,20 @@ data class SleepTime(
         return end.format(formatter)
     }
 
+    /**
+     * Converts the start and end times of this `SleepTime` instance into a `Vertice` object.
+     *
+     * @return A `Vertice` representing the angle positions of the start and end times on a 24-hour clock.
+     */
     fun getVertice(): Vertice {
         val start = Time.stringToDateObj(startTime)
         val end = start.clone() as Calendar
         end.add(Calendar.MINUTE, duration)
 
-        val startHour = start.get(Calendar.HOUR_OF_DAY)
-        val startMinute = start.get(Calendar.MINUTE)
-
-        val endHour = end.get(Calendar.HOUR_OF_DAY)
-        val endMinute = end.get(Calendar.MINUTE)
-
-        val startVertice = (Time.degreesPerHour * startHour) + (Time.degreesPerMinute * startMinute)
-        val endVertice = (Time.degreesPerHour * endHour) + (Time.degreesPerMinute * endMinute)
+        val startVertice = (Time.degreesPerHour * start.get(Calendar.HOUR_OF_DAY)) +
+                (Time.degreesPerMinute * start.get(Calendar.MINUTE))
+        val endVertice = (Time.degreesPerHour * end.get(Calendar.HOUR_OF_DAY)) +
+                (Time.degreesPerMinute * end.get(Calendar.MINUTE))
 
         return object : Vertice {
             override var start: Int = startVertice.toInt()
@@ -61,10 +66,15 @@ data class SleepTime(
         }
     }
 
+    /**
+     * Calculates the exact end time as a `Calendar` object.
+     * Adjusts for cases where the end time crosses over into the next day.
+     *
+     * @return A `Calendar` object representing the end time.
+     */
     fun getEndTime(): Calendar {
         val startCal = Time.stringToDateObj(startTime)
         val endTime = startCal.clone() as Calendar
-
         endTime.add(Calendar.MINUTE, duration)
 
         if (startCal.after(endTime)) {
@@ -74,6 +84,13 @@ data class SleepTime(
         return endTime
     }
 
+    /**
+     * Checks if a given time frame (defined by `timeStart` and `timeEnd`) overlaps with this sleep time.
+     *
+     * @param timeStart The start of the time frame to check, in "HH:mm:ss" format.
+     * @param timeEnd The end of the time frame to check, in "HH:mm:ss" format.
+     * @return `true` if the specified time frame overlaps with this sleep time, otherwise `false`.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     fun isTimeInTimeFrame(timeStart: String, timeEnd: String): Boolean {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -86,19 +103,9 @@ data class SleepTime(
         val isExistingCrossingMidnight = start.isAfter(end)
         val isNewCrossingMidnight = startTimeToCheck.isAfter(endTimeToCheck)
 
-        // check if start/end is the same
-        if(start == startTimeToCheck) {
-            return true
-        }
+        if (start == startTimeToCheck || end == endTimeToCheck) return true
 
-        if(end == endTimeToCheck){
-            return true
-        }
-
-        // if both cross midnight, both overlap
-        if (isExistingCrossingMidnight && isNewCrossingMidnight) {
-            return true
-        }
+        if (isExistingCrossingMidnight && isNewCrossingMidnight) return true
 
         if (isNewCrossingMidnight) {
             return (start.isBefore(endTimeToCheck) || end.isBefore(endTimeToCheck)) ||
@@ -118,5 +125,4 @@ data class SleepTime(
                 (endTimeToCheck.isBefore(end) && endTimeToCheck.isAfter(start)) ||
                 (startTimeToCheck.isBefore(start) && endTimeToCheck.isAfter(end))
     }
-
 }

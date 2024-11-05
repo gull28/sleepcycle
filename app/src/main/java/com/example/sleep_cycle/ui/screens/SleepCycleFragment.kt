@@ -3,7 +3,6 @@ package com.example.sleep_cycle.ui.screens
 import TimeInputDialog
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background

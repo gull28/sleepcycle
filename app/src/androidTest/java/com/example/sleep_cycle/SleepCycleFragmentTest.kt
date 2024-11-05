@@ -6,11 +6,9 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onSibling
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -28,7 +26,6 @@ import com.example.sleep_cycle.mocks.modules.FakeToaster
 import com.example.sleep_cycle.mocks.viewmodel.MockSleepCycleViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.hamcrest.Matchers
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
