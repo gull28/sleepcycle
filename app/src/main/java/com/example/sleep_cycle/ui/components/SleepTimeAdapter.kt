@@ -19,6 +19,7 @@ import com.example.sleep_cycle.helpers.Time
 import com.example.sleep_cycle.ui.theme.AppColors
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 
 
 @Composable
@@ -41,7 +42,8 @@ fun SleepTimeList(
                 onClick = { setSelectedSleepTime(index, sleepTime)  },
                 onEditClicked = { onEditClicked(index, sleepTime) },
                 onRemoveClicked = { onRemoveClicked(index, sleepTime) },
-                isSelected = index == selectedSleepTime // Check if the current item is selected
+                isSelected = index == selectedSleepTime,
+                index = index
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -55,7 +57,8 @@ fun SleepTimeItem(
     onEditClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
     onClick: () -> Unit,
-    isSelected: Boolean
+    isSelected: Boolean,
+    index: Int,
 ) {
     Card(
         modifier = Modifier
@@ -109,7 +112,9 @@ fun SleepTimeItem(
             ) {
                 IconButton(
                     onClick = onEditClicked,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .testTag("edit_sleepTime_$index"),
                     colors = IconButtonDefaults.iconButtonColors(contentColor = AppColors.Slate)
                 ) {
                     Icon(
@@ -123,7 +128,9 @@ fun SleepTimeItem(
 
                 IconButton(
                     onClick = onRemoveClicked,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .testTag("delete_sleepTime_$index"),
                     colors = IconButtonDefaults.iconButtonColors(contentColor = AppColors.Slate)
                 ) {
                     Icon(
