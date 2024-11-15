@@ -49,7 +49,9 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
     val showDialog = remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier.fillMaxSize().background(AppColors.Background),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.Background),
         color = AppColors.Background
     ) {
     Column(
@@ -108,7 +110,9 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
 
         ) {
             Button(

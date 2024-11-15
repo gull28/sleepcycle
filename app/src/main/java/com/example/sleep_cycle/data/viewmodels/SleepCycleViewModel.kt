@@ -21,6 +21,7 @@ import javax.inject.Inject
 import android.content.Context
 import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
+import com.example.sleep_cycle.helpers.ErrorManager
 
 @HiltViewModel
 open class SleepCycleViewModel @Inject constructor(
@@ -28,7 +29,7 @@ open class SleepCycleViewModel @Inject constructor(
     private val sleepTimeRepository: SleepTimeRepository,
     private val toaster: Toaster,
     @ApplicationContext private val appContext: Context,
-
+    private val errorManager: ErrorManager,
     ) : ViewModel() {
 
     init {
@@ -59,9 +60,6 @@ open class SleepCycleViewModel @Inject constructor(
     private val _sleepTimes = MutableLiveData<MutableList<SleepTime>>(mutableListOf())
     val sleepTimes: LiveData<MutableList<SleepTime>> get() = _sleepTimes
 
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> get() = _errorMessage
-
     fun setSleepCycle(sleepCycle: SleepCycle) {
         _sleepCycle.value = sleepCycle
         _sleepTimes.value = sleepCycle.sleepTimes.toMutableList()
@@ -85,10 +83,6 @@ open class SleepCycleViewModel @Inject constructor(
             // otherwise broadcast change
             resetNotifAction()
         }
-    }
-
-    fun clearError() {
-        _errorMessage.value = null
     }
 
     fun addSleepTime(sleepTime: SleepTime, scheduleId: Long) {
@@ -121,8 +115,9 @@ open class SleepCycleViewModel @Inject constructor(
             }
 
             if (overlappingTimeFrame != null) {
-                _errorMessage.value =
-                    "Error: The updated SleepTime overlaps with another time frame."
+                viewModelScope.launch {
+                    errorManager.postError("Error: The updated SleepTime overlaps with another time frame.")
+                }
                 return
             }
 
@@ -130,14 +125,13 @@ open class SleepCycleViewModel @Inject constructor(
                 it.id == updatedSleepTime.id
             }
 
-            if (requiredSleepTime != null) {
-                viewModelScope.launch {
-                    val result = sleepTimeRepository.updateSleepTime(updatedSleepTime)
-
+            viewModelScope.launch {
+                if (requiredSleepTime != null) {
+                    sleepTimeRepository.updateSleepTime(updatedSleepTime)
                     getAllSleepCycles()
+                } else {
+                    errorManager.postError("Error: Invalid position specified.")
                 }
-            } else {
-                _errorMessage.value = "Error: Invalid position specified."
             }
         }
     }
@@ -145,13 +139,13 @@ open class SleepCycleViewModel @Inject constructor(
     fun removeSleepTime(id: Long) {
         viewModelScope.launch {
             try {
-                val result = sleepTimeRepository.deleteSleepTimeById(id)
+                sleepTimeRepository.deleteSleepTimeById(id)
 
                 getAllSleepCycles()
 
                 resetNotifAction()
             } catch (e: Exception) {
-                Log.e("SleepCycleViewModel", e.message.toString())
+                errorManager.postError("Failed to remove sleep time")
             }
         }
     }
@@ -159,7 +153,7 @@ open class SleepCycleViewModel @Inject constructor(
     fun deleteSleepCycle(id: SleepCycle){
         viewModelScope.launch {
             try {
-                val result = sleepCycleRepository.deleteSleepCycle(id)
+                sleepCycleRepository.deleteSleepCycle(id)
 
                 if(id.id == activeSleepCycle.value?.id){
                     setActiveSleepCycle(null)
@@ -168,7 +162,7 @@ open class SleepCycleViewModel @Inject constructor(
                 resetNotifAction()
 
             } catch (e: Exception) {
-                Log.e("123123123dsdff", e.message.toString())
+                errorManager.postError("Failed to delete sleep cycle")
             }
         }
     }
@@ -194,7 +188,6 @@ open class SleepCycleViewModel @Inject constructor(
                 if (selectedSleepCycle != null){
                     _sleepCycle.value = selectedSleepCycle
                     _sleepTimes.value = selectedSleepCycle.sleepTimes.toMutableList()
-
                 }
 
             }
@@ -204,20 +197,19 @@ open class SleepCycleViewModel @Inject constructor(
     }
 
     fun toggleActive(id: Long, isActive: Int) {
+
         viewModelScope.launch {
             // find the sleepCycle
-            val result = sleepCycleRepository.toggleActive(id, isActive)
+            try {
+                sleepCycleRepository.toggleActive(id, isActive)
 
-            val activeCycle = sleepCycleRepository.getActiveSleepCycle()
-            // set it as active in the ViewModel
-            setActiveSleepCycle(activeCycle)
+                val activeCycle = sleepCycleRepository.getActiveSleepCycle()
+                // set it as active in the ViewModel
+                setActiveSleepCycle(activeCycle)
 
-            // Profit
-//            if () {
-//                Log.d("SleepCycleViewModel", "Sleep cycle toggled successfully.")
-//            } else {
-//                _errorMessage.value = "Error: Unable to toggle sleep cycle."
-//            }
+            }catch (e: Exception) {
+                errorManager.postError("Failed to toggle active sleep cycle")
+            }
         }
     }
 

@@ -26,7 +26,6 @@ fun Settings (
 ){
     val mode = preferences.modeFlow.collectAsState(initial = true)
 
-
     Column(
         modifier = Modifier.background(AppColors.Background).fillMaxSize().padding(horizontal = 24.dp)
 

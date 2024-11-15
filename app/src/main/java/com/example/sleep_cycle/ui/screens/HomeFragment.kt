@@ -31,7 +31,6 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
     val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList())
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
     val mode = preferences.modeFlow.collectAsState(initial = true)
-
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(sleepCycles) {

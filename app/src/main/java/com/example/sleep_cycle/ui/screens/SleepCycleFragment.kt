@@ -36,7 +36,6 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
     val sleepTimes = sleepTimesState.value?.toMutableList() ?: mutableListOf()
 
     val sleepCycle by viewModel.sleepCycle.observeAsState()
-    val errorMessage by viewModel.errorMessage.observeAsState()
 
     val showDialog = remember { mutableStateOf(false) }
     val editedSleepTime = remember { mutableStateOf<Int?>(null) }
@@ -44,14 +43,6 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
 
     val selectedVertice = selectedSleepTime.value?.let { index ->
         sleepTimes.getOrNull(index)?.getVertice()
-    }
-
-
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            viewModel.clearError()
-        }
     }
 
     Column(

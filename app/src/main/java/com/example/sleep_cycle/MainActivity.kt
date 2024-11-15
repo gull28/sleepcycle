@@ -39,6 +39,8 @@ import androidx.core.content.ContextCompat
 import com.example.sleep_cycle.data.db.Seed
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
+import com.example.sleep_cycle.helpers.ErrorManager
+import com.example.sleep_cycle.ui.components.GlobalErrorHandler
 import com.example.sleep_cycle.ui.theme.AppColors
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,6 +53,9 @@ class MainActivity : ComponentActivity() {
     private val preferenceViewModel: PreferenceViewModel by viewModels()
 
     lateinit var navController: NavHostController
+
+    @Inject
+    lateinit var errorManager: ErrorManager
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +81,8 @@ class MainActivity : ComponentActivity() {
                 color = AppColors.Background
             ) {
                 navController = rememberNavController()
+
+                GlobalErrorHandler(errorManager = errorManager)
                 MainScreen(navController)
             }
         }
@@ -149,7 +156,9 @@ fun MainScreen(navController: NavHostController) {
     ) { innerPadding ->
         AppNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding).background(AppColors.Background)
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(AppColors.Background)
         )
     }
 }

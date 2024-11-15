@@ -8,10 +8,10 @@ import com.example.sleep_cycle.data.models.SleepCycle
 interface SleepCycleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    open suspend fun addSleepCycle(sleepCycle: SleepCycle): Long
+    suspend fun addSleepCycle(sleepCycle: SleepCycle): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    open suspend fun insertSleepTimes(sleepTimes: List<SleepTime>)
+    suspend fun insertSleepTimes(sleepTimes: List<SleepTime>)
 
     @Transaction
     open suspend fun addSleepCycleWithTimes(sleepCycle: SleepCycle, sleepTimes: List<SleepTime>) {
@@ -21,10 +21,10 @@ interface SleepCycleDao {
     }
 
     @Query("UPDATE sleep_cycles SET isActive = :isActive WHERE id = :id")
-    open suspend fun toggleActive(id: Long, isActive: Int)
+    suspend fun toggleActive(id: Long, isActive: Int)
 
     @Query("DELETE FROM sleep_times WHERE scheduleId = :scheduleId")
-    open suspend fun deleteSleepTimesByScheduleId(scheduleId: Long)
+    suspend fun deleteSleepTimesByScheduleId(scheduleId: Long)
 
     @Transaction
     open suspend fun saveSleepTimes(cycleId: Long, sleepTimes: List<SleepTime>) {
@@ -47,7 +47,7 @@ interface SleepCycleDao {
     @Query("SELECT * FROM sleep_cycles WHERE id = :id")
     suspend fun getSleepCycleById(id: Long): SleepCycle?
 
-    @Query("SELECT * FROM sleep_times WHERE scheduleId = :scheduleId")
+    @Query("SELECT * FROM sleep_times WHERE scheduleId = :scheduleId ORDER BY start_time ASC")
     suspend fun getSleepTimesForCycle(scheduleId: Long): List<SleepTime>
 
     @Transaction
@@ -93,5 +93,4 @@ interface SleepCycleDao {
 
     @Query("DELETE FROM sleep_cycles WHERE id = :id")
     suspend fun deleteSleepCycleById(id: Long)
-
 }

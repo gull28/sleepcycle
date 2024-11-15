@@ -7,6 +7,7 @@ import com.example.sleep_cycle.data.dao.SleepTimeDao
 import com.example.sleep_cycle.data.repository.Preference
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
+import com.example.sleep_cycle.helpers.ErrorManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,5 +53,11 @@ object SleepCycleModule {
     @Singleton
     fun provideSleepTimeRepository(sleepTimeDao: SleepTimeDao): SleepTimeRepository {
         return SleepTimeRepository(sleepTimeDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideErrorManager(): ErrorManager {
+        return ErrorManager()
     }
 }
