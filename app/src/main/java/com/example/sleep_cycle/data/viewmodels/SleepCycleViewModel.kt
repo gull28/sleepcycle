@@ -22,6 +22,7 @@ import android.content.Context
 import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
 import com.example.sleep_cycle.helpers.ErrorManager
+import com.example.sleep_cycle.helpers.canAddSleepTime
 
 @HiltViewModel
 open class SleepCycleViewModel @Inject constructor(
@@ -85,11 +86,19 @@ open class SleepCycleViewModel @Inject constructor(
         }
     }
 
-    fun addSleepTime(sleepTime: SleepTime, scheduleId: Long) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun addSleepTime(sleepTime: SleepTime) {
 
         viewModelScope.launch{
-            sleepTime.scheduleId = scheduleId
-            sleepTimeRepository.addSleepTime(sleepTime)
+            sleepTime.scheduleId = sleepCycle.value?.id
+
+            val result = canAddSleepTime(_sleepTimes.value ?: mutableListOf(), sleepTime)
+
+            if(result.isValid) {
+                sleepTimeRepository.addSleepTime(sleepTime)
+            } else {
+                result.message?.let { errorManager.postError(it) }
+            }
 
             _sleepTimes.value?.let {
                 it.add(sleepTime)

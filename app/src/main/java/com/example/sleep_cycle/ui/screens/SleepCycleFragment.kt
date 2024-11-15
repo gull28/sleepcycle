@@ -24,6 +24,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.sleep_cycle.helpers.canAddSleepTime
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.theme.AppColors
 
@@ -157,7 +158,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
             TimeInputDialog(
                 sleepTime = currentSleepTime,
                 onSave = { sleepTime ->
-                    handleSaveSleepTime(sleepTime, viewModel, context, editedSleepTime.value, navController)
+                    handleSaveSleepTime(sleepTime, viewModel, editedSleepTime.value)
                     editedSleepTime.value = null
                     viewModel.resetNotifAction()
                 },
@@ -178,41 +179,16 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
 private fun handleSaveSleepTime(
     sleepTime: SleepTime,
     viewModel: SleepCycleViewModel,
-    context: Context,
     selectedSleepTime: Int?,
-    navController: NavController
 ) {
     // Check if editing
     if (selectedSleepTime != null) {
         // Edit route
-        val res = viewModel.updateSleepTime(sleepTime)
+        viewModel.updateSleepTime(sleepTime)
 
         viewModel.getAllSleepCycles()
     } else {
-        // Add route
-        val filteredSleepTimes = viewModel.sleepTimes.value?.filter {
-            it.id != sleepTime.id;
-        }
-
-        val overlappingTime = filteredSleepTimes?.find {
-            it.isTimeInTimeFrame(sleepTime.startTime, sleepTime.calculateEndTime())
-        }
-        val sameStartTime = filteredSleepTimes?.find { it.startTime == sleepTime.startTime }
-
-        if (overlappingTime != null) {
-            Toast.makeText(context, "This time overlaps with an existing SleepTime.", Toast.LENGTH_SHORT).show()
-        } else if (sameStartTime == null) {
-
-            val scheduleId = viewModel.sleepCycle.value?.id
-
-            if (scheduleId != null) {
-                viewModel.addSleepTime(sleepTime, scheduleId)
-
-                viewModel.getAllSleepCycles()
-            }
-        } else {
-            Toast.makeText(context, "A SleepTime with the same start time already exists.", Toast.LENGTH_SHORT).show()
-        }
+        viewModel.addSleepTime(sleepTime)
     }
 }
 

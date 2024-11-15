@@ -136,7 +136,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                         }
 
                     } catch (e: Exception) {
-                        Log.e("exceptionally bad", e.message.toString())
+                        viewModel.showToast("Error saving sleep cycle")
                     }
                 }
             )
