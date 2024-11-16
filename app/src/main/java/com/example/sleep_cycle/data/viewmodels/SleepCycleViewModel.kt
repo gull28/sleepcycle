@@ -98,6 +98,7 @@ open class SleepCycleViewModel @Inject constructor(
                 sleepTimeRepository.addSleepTime(sleepTime)
             } else {
                 result.message?.let { errorManager.postError(it) }
+                return@launch
             }
 
             _sleepTimes.value?.let {
