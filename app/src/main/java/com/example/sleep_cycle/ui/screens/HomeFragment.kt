@@ -17,9 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.sleep_cycle.data.viewmodels.HomeViewModel
+import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
-import com.example.sleep_cycle.data.viewmodels.MainScreenViewModel
+import com.example.sleep_cycle.data.viewmodels.HomeViewModel
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepCycleList
 import com.example.sleep_cycle.ui.components.Timer
@@ -27,7 +27,7 @@ import com.example.sleep_cycle.ui.theme.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel, preferences: PreferenceViewModel) {
+fun HomeScreen(navController: NavController, viewModel: HomeViewModel, preferences: PreferenceViewModel, onSleepCycleClick: (SleepCycle) -> Unit) {
     val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList())
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
     val mode = preferences.modeFlow.collectAsState(initial = true)
@@ -105,7 +105,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel, preferenc
                 )
 
                 Button(
-                    onClick = { activeSleepCycle?.let { viewModel.setSleepCycle(sleepCycle = it) }
+                    onClick = { activeSleepCycle?.let { onSleepCycleClick(it) }
                         navController.navigate("sleepCycleScreen")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.ClockFace),
@@ -188,6 +188,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel, preferenc
                 sleepCycles = sleepCycles,
                 navController = navController,
                 sleepCycleViewModel = viewModel,
+                onSleepCycleClick
             )
         }
 

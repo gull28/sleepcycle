@@ -1,9 +1,7 @@
 package com.example.sleep_cycle.ui.screens
 
 import TimeInputDialog
-import android.content.Context
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,7 +22,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.sleep_cycle.helpers.canAddSleepTime
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.theme.AppColors
 
@@ -73,7 +70,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
 
             SleepTimeList(
                 sleepTimes = sleepTimes,
-                onEditClicked = { position, sleepTime ->
+                onEditClicked = { position, _ ->
                     showDialog.value = true
                     editedSleepTime.value = position
                 },
@@ -86,7 +83,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                     selectedSleepTime.value = position
                 },
                 onRemoveClicked = { _, sleepTime ->
-                    sleepTime.id?.let { viewModel.removeSleepTime(it) }
+                    sleepTime.let { viewModel.removeSleepTime(it) }
 
                     viewModel.resetNotifAction()
                 }
@@ -169,7 +166,7 @@ fun SleepCycleScreen(navController: NavController, viewModel: SleepCycleViewMode
                     editedSleepTime.value = null
                     showDialog.value = false
                 },
-                sleepCycleViewModel = viewModel
+                showToast = { viewModel.showToast(it) }
             )
         }
     }
@@ -185,8 +182,6 @@ private fun handleSaveSleepTime(
     if (selectedSleepTime != null) {
         // Edit route
         viewModel.updateSleepTime(sleepTime)
-
-        viewModel.getAllSleepCycles()
     } else {
         viewModel.addSleepTime(sleepTime)
     }

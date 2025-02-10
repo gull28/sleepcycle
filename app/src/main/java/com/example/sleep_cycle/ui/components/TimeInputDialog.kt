@@ -1,5 +1,4 @@
 import android.app.TimePickerDialog
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -20,7 +19,7 @@ fun TimeInputDialog(
     setShowDialog: (value: Boolean) -> Unit,
     onSave: (SleepTime) -> Unit,
     onDismiss: () -> Unit,
-    sleepCycleViewModel: SleepCycleViewModel
+    showToast: (String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -34,7 +33,6 @@ fun TimeInputDialog(
         val initialMinute = startTime.split(":")[1].toIntOrNull() ?: calendar.get(Calendar.MINUTE)
 
         TimePickerDialog(context, { _, hourOfDay, minute ->
-            // Append :00 for seconds
             startTime = String.format("%02d:%02d:00", hourOfDay, minute)
         }, initialHour, initialMinute, true).show()
     }
@@ -44,7 +42,6 @@ fun TimeInputDialog(
         val initialMinute = duration % 60
 
         TimePickerDialog(context, { _, hourOfDay, minute ->
-            // Convert duration to minutes and seconds (0 seconds by default)
             duration = hourOfDay * 60 + minute
         }, initialHour, initialMinute, true).show()
     }
@@ -133,7 +130,7 @@ fun TimeInputDialog(
                         onSave(sleep)
                         onDismiss()
                     } else {
-                        sleepCycleViewModel.showToast("Please fill all fields correctly")
+                        showToast("Please fill all fields correctly")
                     }
                 },
                 shape = MaterialTheme.shapes.medium,

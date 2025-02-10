@@ -31,15 +31,20 @@ class HomeViewModel @Inject constructor(
     private val toaster: Toaster,
     @ApplicationContext private val appContext: Context,
     private val errorManager: ErrorManager,
-    ) : ViewModel() {
+    ) : BaseViewModel(appContext, toaster) {
+
+
+    // set all cycles
+    private val _sleepCycles = MutableLiveData<List<SleepCycle>>()
+    val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
+
+
+    private val _sleepTimes = MutableLiveData<MutableList<SleepTime>>(mutableListOf())
+    val sleepTimes: LiveData<MutableList<SleepTime>> get() = _sleepTimes
 
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
         getAllSleepCycles()
-    }
-
-    fun showToast(message: String) {
-        toaster.showToast(message)
     }
 
     override fun onCleared() {
@@ -47,134 +52,7 @@ class HomeViewModel @Inject constructor(
         Log.d("SleepCycleViewModel", "ViewModel cleared")
     }
 
-    // set all cycles
-    private val _sleepCycles = MutableLiveData<List<SleepCycle>>()
-    open val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
-
-    // this is for active sleep cycle (toggled on)
-    private val _activeSleepCycle = MutableLiveData<SleepCycle?>()
-    val activeSleepCycle: MutableLiveData<SleepCycle?> get() = _activeSleepCycle
-
-    private val _sleepTimes = MutableLiveData<MutableList<SleepTime>>(mutableListOf())
-    val sleepTimes: LiveData<MutableList<SleepTime>> get() = _sleepTimes
-
-    fun setActiveSleepCycle(sleepCycle: SleepCycle?){
-        _activeSleepCycle.value = sleepCycle
-
-        // this is the case for when the user disables the notification when de-toggling a cycle
-        // get notif
-        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val existingNotification = notificationManager.activeNotifications.find { it.id == 1 }
-
-        // if doesnt exist create one
-        if (existingNotification == null) {
-            val serviceIntent = Intent(appContext, ForegroundService::class.java)
-            ContextCompat.startForegroundService(appContext, serviceIntent)
-
-            resetNotifAction()
-        } else {
-            // otherwise broadcast change
-            resetNotifAction()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun addSleepTime(sleepTime: SleepTime) {
-
-        viewModelScope.launch{
-            sleepTime.scheduleId = sleepCycle.value?.id
-
-            val result = canAddSleepTime(_sleepTimes.value ?: mutableListOf(), sleepTime)
-
-            if(result.isValid) {
-                sleepTimeRepository.addSleepTime(sleepTime)
-            } else {
-                result.message?.let { errorManager.postError(it) }
-                return@launch
-            }
-
-            _sleepTimes.value?.let {
-                it.add(sleepTime)
-                _sleepTimes.value = it
-            }
-        }
-    }
-
-    open fun addSleepCycle(sleepCycle: SleepCycle) {
-        viewModelScope.launch {
-            sleepCycleRepository.addSleepCycleWithTimes(sleepCycle)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updateSleepTime(updatedSleepTime: SleepTime) {
-        val filteredSleepTimes = _sleepTimes.value?.filter {
-            it.id != updatedSleepTime.id
-        }
-        _sleepTimes.value?.let { sleepTimes ->
-            val overlappingTimeFrame = filteredSleepTimes?.find {
-                it.isTimeInTimeFrame(updatedSleepTime.startTime, updatedSleepTime.calculateEndTime())
-            }
-
-            if (overlappingTimeFrame != null) {
-                viewModelScope.launch {
-                    errorManager.postError("Error: The updated SleepTime overlaps with another time frame.")
-                }
-                return
-            }
-
-            val requiredSleepTime = sleepTimes.find {
-                it.id == updatedSleepTime.id
-            }
-
-            viewModelScope.launch {
-                if (requiredSleepTime != null) {
-                    sleepTimeRepository.updateSleepTime(updatedSleepTime)
-                    getAllSleepCycles()
-                } else {
-                    errorManager.postError("Error: Invalid position specified.")
-                }
-            }
-        }
-    }
-
-    fun removeSleepTime(id: Long) {
-        viewModelScope.launch {
-            try {
-                sleepTimeRepository.deleteSleepTimeById(id)
-
-                getAllSleepCycles()
-
-                resetNotifAction()
-            } catch (e: Exception) {
-                errorManager.postError("Failed to remove sleep time")
-            }
-        }
-    }
-
-    fun deleteSleepCycle(id: SleepCycle){
-        viewModelScope.launch {
-            try {
-                sleepCycleRepository.deleteSleepCycle(id)
-
-                if(id.id == activeSleepCycle.value?.id){
-                    setActiveSleepCycle(null)
-                }
-                getAllSleepCycles()
-                resetNotifAction()
-
-            } catch (e: Exception) {
-                errorManager.postError("Failed to delete sleep cycle")
-            }
-        }
-    }
-
-    fun resetNotifAction(){
-        val broadcastIntent = Intent("UPDATE_SLEEP_CYCLE")
-        appContext.sendBroadcast(broadcastIntent)
-    }
-
-    open fun getAllSleepCycles(): List<SleepCycle>? {
+    private fun getAllSleepCycles(): List<SleepCycle>? {
         viewModelScope.launch {
             val cycles = sleepCycleRepository.getAllSleepCycles()
             _sleepCycles.value = cycles
@@ -183,16 +61,6 @@ class HomeViewModel @Inject constructor(
 
             if (activeCycle != null)
                 _activeSleepCycle.value = activeCycle
-
-            if(sleepCycle.value != null){
-                val selectedSleepCycle = cycles.find { it.id == sleepCycle.value!!.id }
-
-                if (selectedSleepCycle != null){
-                    _sleepCycle.value = selectedSleepCycle
-                    _sleepTimes.value = selectedSleepCycle.sleepTimes.toMutableList()
-                }
-
-            }
         }
 
         return _sleepCycles.value;
@@ -211,18 +79,6 @@ class HomeViewModel @Inject constructor(
 
             }catch (e: Exception) {
                 errorManager.postError("Failed to toggle active sleep cycle")
-            }
-        }
-    }
-
-    private fun loadSleepTimes() {
-        viewModelScope.launch {
-            val sleepCycleId = sleepCycle.value?.id
-            if (sleepCycleId != null) {
-                val sleepCycleWithTimes = sleepCycleRepository.getSleepCycleById(sleepCycleId)
-                _sleepTimes.value = sleepCycleWithTimes?.sleepTimes?.toMutableList() ?: mutableListOf()
-            } else {
-                _sleepTimes.value = mutableListOf() // Fallback in case there's no selected sleep cycle
             }
         }
     }

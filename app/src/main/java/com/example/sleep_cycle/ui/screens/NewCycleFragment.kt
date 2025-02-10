@@ -2,7 +2,6 @@ package com.example.sleep_cycle.ui.screens
 
 import TimeInputDialog
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.ui.*
@@ -25,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sleep_cycle.data.models.SleepTime
 import com.example.sleep_cycle.data.models.SleepCycle
-import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
+import com.example.sleep_cycle.data.viewmodels.NewSleepCycleViewModel
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepTimeList
 import com.example.sleep_cycle.ui.theme.AppColors
@@ -33,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewModel) {
+fun NewCycleFragment(navController: NavController, viewModel: NewSleepCycleViewModel) {
     val sleepTimes = remember { mutableStateListOf<SleepTime>() }
     val editedSleepTime = remember { mutableStateOf<Int?>(null) }
     val selectedSleepTime = remember { mutableStateOf<Int?>(null) }
@@ -131,7 +130,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
                         }
 
                         coroutineScope.launch {
-                            viewModel.addSleepCycle(sleepCycle = sleepCycle)
+                            viewModel.createSleepCycle(sleepCycle = sleepCycle)
                             navController.navigate("home")
                         }
 
@@ -221,7 +220,7 @@ fun NewCycleFragment(navController: NavController, viewModel: SleepCycleViewMode
 
                 },
                 onDismiss = { showDialog.value = false },
-                sleepCycleViewModel = viewModel
+                showToast = { viewModel.showToast(it) }
             )
         }
     }

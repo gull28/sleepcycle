@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sleep_cycle.data.models.SleepCycle
-import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
+import com.example.sleep_cycle.data.viewmodels.HomeViewModel
 import com.example.sleep_cycle.helpers.Time
 import com.example.sleep_cycle.ui.theme.AppColors
 
@@ -32,7 +32,8 @@ import com.example.sleep_cycle.ui.theme.AppColors
 fun SleepCycleList(
     sleepCycles: List<SleepCycle>,
     navController: NavController,
-    sleepCycleViewModel: SleepCycleViewModel
+    sleepCycleViewModel: HomeViewModel,
+    onSleepCycleClick: (SleepCycle) -> Unit
 ) {
     val activeSleepCycle by sleepCycleViewModel.activeSleepCycle.observeAsState()
 
@@ -49,7 +50,7 @@ fun SleepCycleList(
                 totalSleepTime = cycle.totalSleepTime(),
                 isActive = activeSleepCycle?.id == cycle.id,
                 onClick = {
-                    sleepCycleViewModel.setSleepCycle(cycle)
+                    onSleepCycleClick(cycle)
                     navController.navigate("sleepCycleScreen")
                 },
                 onToggleActive = { value ->

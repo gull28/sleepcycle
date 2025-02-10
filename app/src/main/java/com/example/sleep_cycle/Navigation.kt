@@ -12,6 +12,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.sleep_cycle.data.viewmodels.HomeViewModel
+import com.example.sleep_cycle.data.viewmodels.NewSleepCycleViewModel
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import com.example.sleep_cycle.ui.screens.HomeScreen
@@ -24,8 +26,10 @@ import com.example.sleep_cycle.ui.theme.AppColors
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    val viewModel: SleepCycleViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val sleepCycleViewModel: SleepCycleViewModel = hiltViewModel()
     val preferences: PreferenceViewModel = hiltViewModel()
+    val newSleepCycleViewModel: NewSleepCycleViewModel = hiltViewModel()
 
     Surface(
         modifier = Modifier
@@ -48,7 +52,10 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                 popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
             ) {
-                HomeScreen(navController = navController, viewModel = viewModel, preferences = preferences)
+                HomeScreen(navController = navController, viewModel = homeViewModel, preferences = preferences, onSleepCycleClick = {
+                    sleepCycleViewModel.setSleepCycle(it)
+                    navController.navigate("sleepCycleScreen")
+                })
             }
             composable(
                 "sleepCycleScreen",
@@ -57,7 +64,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                 popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
             ) {
-                SleepCycleScreen(navController = navController, viewModel = viewModel)
+                SleepCycleScreen(navController = navController, viewModel = sleepCycleViewModel)
             }
             composable(
                 "newCycleScreen",
@@ -66,7 +73,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                 popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
             ) {
-                NewCycleFragment(navController = navController, viewModel = viewModel)
+                NewCycleFragment(navController = navController, viewModel = newSleepCycleViewModel)
             }
             composable(
                 "settingsScreen",
@@ -84,7 +91,10 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                 popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
                 ){
-                SleepCycleListFragment(navController, viewModel)
+                SleepCycleListFragment(navController, homeViewModel, onSleepCycleClick =  {
+                    sleepCycleViewModel.setSleepCycle(it)
+                    navController.navigate("sleepCycleScreen")
+                })
             }
         }
     }
