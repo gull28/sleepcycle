@@ -25,7 +25,7 @@ import com.example.sleep_cycle.helpers.ErrorManager
 import com.example.sleep_cycle.helpers.canAddSleepTime
 
 @HiltViewModel
-open class SleepCycleViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val sleepCycleRepository: SleepCycleRepository,
     private val sleepTimeRepository: SleepTimeRepository,
     private val toaster: Toaster,
@@ -35,6 +35,7 @@ open class SleepCycleViewModel @Inject constructor(
 
     init {
         Log.d("SleepCycleViewModel", "ViewModel initialized")
+        getAllSleepCycles()
     }
 
     fun showToast(message: String) {
@@ -50,21 +51,12 @@ open class SleepCycleViewModel @Inject constructor(
     private val _sleepCycles = MutableLiveData<List<SleepCycle>>()
     open val sleepCycles: LiveData<List<SleepCycle>> get() = _sleepCycles
 
-    // this is selected  sleep cycle
-    private val _sleepCycle = MutableLiveData<SleepCycle?>()
-    val sleepCycle: MutableLiveData<SleepCycle?> get() = _sleepCycle
-
     // this is for active sleep cycle (toggled on)
     private val _activeSleepCycle = MutableLiveData<SleepCycle?>()
     val activeSleepCycle: MutableLiveData<SleepCycle?> get() = _activeSleepCycle
 
     private val _sleepTimes = MutableLiveData<MutableList<SleepTime>>(mutableListOf())
     val sleepTimes: LiveData<MutableList<SleepTime>> get() = _sleepTimes
-
-    fun setSleepCycle(sleepCycle: SleepCycle) {
-        _sleepCycle.value = sleepCycle
-        _sleepTimes.value = sleepCycle.sleepTimes.toMutableList()
-    }
 
     fun setActiveSleepCycle(sleepCycle: SleepCycle?){
         _activeSleepCycle.value = sleepCycle

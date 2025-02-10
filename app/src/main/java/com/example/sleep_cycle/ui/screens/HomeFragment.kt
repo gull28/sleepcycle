@@ -17,8 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.sleep_cycle.data.viewmodels.HomeViewModel
 import com.example.sleep_cycle.data.viewmodels.PreferenceViewModel
-import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
+import com.example.sleep_cycle.data.viewmodels.MainScreenViewModel
 import com.example.sleep_cycle.ui.components.Clock
 import com.example.sleep_cycle.ui.components.SleepCycleList
 import com.example.sleep_cycle.ui.components.Timer
@@ -26,8 +27,7 @@ import com.example.sleep_cycle.ui.theme.AppColors
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, preferences: PreferenceViewModel) {
-    viewModel.getAllSleepCycles()
+fun HomeScreen(navController: NavController, viewModel: HomeViewModel, preferences: PreferenceViewModel) {
     val sleepCycles by viewModel.sleepCycles.observeAsState(initial = emptyList())
     val activeSleepCycle by viewModel.activeSleepCycle.observeAsState()
     val mode = preferences.modeFlow.collectAsState(initial = true)
@@ -167,10 +167,12 @@ fun HomeScreen(navController: NavController, viewModel: SleepCycleViewModel, pre
 
             Row (
                 horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth().padding(
-                    top = 10.dp,
-                    bottom = 4.dp,
-                )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 10.dp,
+                        bottom = 4.dp,
+                    )
             ) {
                 Button(
                     colors = ButtonDefaults.buttonColors(

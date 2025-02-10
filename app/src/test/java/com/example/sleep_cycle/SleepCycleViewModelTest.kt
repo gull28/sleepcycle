@@ -6,6 +6,7 @@ import com.example.sleep_cycle.data.models.SleepCycle
 import com.example.sleep_cycle.data.modules.Toaster
 import com.example.sleep_cycle.data.repository.SleepCycleRepository
 import com.example.sleep_cycle.data.repository.SleepTimeRepository
+import com.example.sleep_cycle.data.viewmodels.MainScreenViewModel
 import com.example.sleep_cycle.data.viewmodels.SleepCycleViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -25,7 +26,7 @@ class SleepCycleViewModelTest {
     @get:Rule
     val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
-    private lateinit var viewModel: SleepCycleViewModel
+    private lateinit var viewModel: MainScreenViewModel
     private lateinit var mockSleepCycleRepository: SleepCycleRepository
     private lateinit var mockSleepTimeRepository: SleepTimeRepository
     private lateinit var mockToaster: Toaster
@@ -37,8 +38,7 @@ class SleepCycleViewModelTest {
         mockSleepTimeRepository = mock(SleepTimeRepository::class.java)
         mockToaster = mock(Toaster::class.java)  // Mock Toaster as well
 
-        // Initialize the ViewModel with mocked dependencies
-        viewModel = SleepCycleViewModel(mockSleepCycleRepository, mockSleepTimeRepository, mockToaster, mockContext)
+        viewModel = MainScreenViewModel(mockSleepCycleRepository, mockSleepTimeRepository, mockToaster, mockContext)
     }
 
     @Test
